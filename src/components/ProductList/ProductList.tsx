@@ -52,17 +52,10 @@ export default function ProductList({
               className={`product-item ${openProductId === item.id ? "active" : ""} ${isDisposalItem ? "written-off-item" : ""}`}
               onClick={() => onProductClick(item.id)}
               style={{
-                borderLeftColor: isDisposalItem
-                  ? "#dc3545"
-                  : getCategoryColor(item.inventory_tools_type),
+                borderLeftColor: getCategoryColor(item.inventory_tools_type),
               }}
             >
-              <span className="product-name">
-                {item.name}
-                {isDisposalItem && (
-                  <span className="written-off-badge-small">СПИСАНО</span>
-                )}
-              </span>
+              <span className="product-name">{item.name}</span>
               <span className="product-price">
                 {item.price?.toLocaleString() || 0} ₽
               </span>
@@ -73,9 +66,7 @@ export default function ProductList({
               <div
                 className={`product-details ${isDisposalItem ? "written-off-details" : ""}`}
                 style={{
-                  borderLeftColor: isDisposalItem
-                    ? "#dc3545"
-                    : getCategoryColor(item.inventory_tools_type),
+                  borderLeftColor: getCategoryColor(item.inventory_tools_type),
                 }}
               >
                 <div className="details-content">
@@ -189,38 +180,6 @@ export default function ProductList({
                       </div>
                     </>
                   )}
-
-                  {/* Для списанных товаров */}
-                  {isDisposalItem && onRestoreClick && (
-                    <div className="action-item">
-                      <p className="action-text">Восстановить МЦ</p>
-                      <button
-                        className="action-button restore-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onRestoreClick(item as Disposal);
-                        }}
-                        title="Восстановить"
-                      >
-                        🔄
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Кнопка просмотра для всех (всегда одна) */}
-                  <div className="action-item">
-                    <p className="action-text">Просмотр</p>
-                    <button
-                      className="action-button view-button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onViewClick(item);
-                      }}
-                      title="Просмотр"
-                    >
-                      👁️
-                    </button>
-                  </div>
                 </div>
               </div>
             )}

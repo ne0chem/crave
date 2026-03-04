@@ -131,14 +131,6 @@ export interface WriteoffData {
   person: string;
 }
 
-// Данные для восстановления
-export interface RestoreData {
-  disposalId: string;
-  // Можно добавить поля, если нужны
-  restored_by?: string;
-  restored_at?: string;
-}
-
 // Обновление товара (Partial значит все поля опциональные)
 export interface UpdateProductData extends Partial<CreateProductData> {
   id: string; // id обязателен

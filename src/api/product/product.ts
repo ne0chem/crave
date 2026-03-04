@@ -124,37 +124,6 @@ export const productsApi = {
     }
   },
 
-  // 3. Восстановление товара (отмена списания)
-  restoreProduct: async (productId: string) => {
-    console.log(`🔄 Восстановление товара ${productId}`);
-
-    try {
-      // Ищем в списанных
-      const writtenOff = await apiClient.get(
-        `/written_off_inventory/${productId}`,
-      );
-
-      // Возвращаем в активный инвентарь (убираем поля списания)
-      const restoreData = { ...writtenOff.data };
-      delete restoreData.written_off_by;
-      delete restoreData.reason;
-      delete restoreData.deleted_at;
-
-      await apiClient.post(`/inventory_tools_type`, restoreData);
-
-      // Удаляем из списанных
-      await apiClient.delete(`/written_off_inventory/${productId}`);
-
-      console.log(`✅ Товар восстановлен`);
-      return { success: true };
-    } catch (error: any) {
-      console.error(`❌ Ошибка восстановления:`, error);
-      throw error;
-    }
-  },
-
-  // ============= РЕДАКТИРОВАНИЕ И ДОБАВЛЕНИЕ (второй запрос) =============
-
   // Универсальный метод для создания/обновления
   saveProduct: async (data: CreateProductData | UpdateProductData) => {
     // Если есть id - это обновление, если нет - создание

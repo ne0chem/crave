@@ -23,7 +23,7 @@ interface UniversalModalProps {
   onClose: () => void;
   type: ModalType | null;
   itemData?: any;
-  rooms?: Room[]; // 👈 Используем тип Room
+  rooms?: Room[];
   categories?: string[];
   onSave?: (data: Partial<FormData>) => void;
   onConfirm?: () => void;
@@ -56,6 +56,7 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
   });
 
   const [isEditMode, setIsEditMode] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (itemData) {
@@ -73,10 +74,35 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // Очищаем ошибку для этого поля при изменении
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (type === modalTypes.ACTION) {
+      if (!formData.name) newErrors.name = "Введите наименование МЦ";
+      if (!formData.actionDate) newErrors.actionDate = "Выберите дату списания";
+      if (!formData.actionReason)
+        newErrors.actionReason = "Укажите причину списания";
+      if (!formData.actionPerson)
+        newErrors.actionPerson = "Введите ФИО ответственного";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (type === modalTypes.ACTION && !validateForm()) {
+      return;
+    }
+
     if (type === modalTypes.CONFIRM) {
       onConfirm?.();
     } else if (type === modalTypes.ACTION) {
@@ -86,27 +112,30 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
     }
   };
 
-  // 👇 Функция для форматирования названия комнаты
   const getRoomDisplayName = (room: Room): string => {
     return `${room.name} ${room.number} (${room.building}, ${room.floor} этаж)`;
   };
 
   const renderItemForm = () => (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Наименование товара:</label>
+    <form className="form__style" onSubmit={handleSubmit}>
+      <div className="form__input">
+        <label className="label__text">Наименование МЦ:</label>
         <input
+          className={`input__text ${errors.name ? "error" : ""}`}
           type="text"
           name="name"
           value={formData.name}
           onChange={handleInputChange}
           readOnly={type === modalTypes.ITEM_VIEW && !isEditMode}
+          placeholder="Введите наименование"
         />
+        {errors.name && <span className="error-message">{errors.name}</span>}
       </div>
 
-      <div>
-        <label>Категория:</label>
+      <div className="form__input">
+        <label className="label__text">Категория:</label>
         <select
+          className={`input__text ${errors.category ? "error" : ""}`}
           name="category"
           value={formData.category}
           onChange={handleInputChange}
@@ -121,9 +150,10 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
         </select>
       </div>
 
-      <div>
-        <label>Местоположение:</label>
+      <div className="form__input">
+        <label className="label__text">Местоположение:</label>
         <select
+          className={`input__text ${errors.roomId ? "error" : ""}`}
           name="roomId"
           value={formData.roomId}
           onChange={handleInputChange}
@@ -138,49 +168,65 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
         </select>
       </div>
 
-      <div>
-        <label>Стоимость:</label>
+      <div className="form__input">
+        <label className="label__text">Стоимость:</label>
         <input
+          className={`input__text ${errors.price ? "error" : ""}`}
           type="number"
           name="price"
           value={formData.price}
           onChange={handleInputChange}
           readOnly={type === modalTypes.ITEM_VIEW && !isEditMode}
+          placeholder="Введите стоимость"
         />
       </div>
 
-      <div>
-        <label>Инвентаризационный номер:</label>
+      <div className="form__input">
+        <label className="label__text">Инвентаризационный номер:</label>
         <input
+          className={`input__text ${errors.inventNumber ? "error" : ""}`}
           type="text"
           name="inventNumber"
           value={formData.inventNumber}
           onChange={handleInputChange}
           readOnly={type === modalTypes.ITEM_VIEW && !isEditMode}
+          placeholder="Введите инвентаризационный номер"
         />
       </div>
 
-      <div>
-        <label>Информация о товаре:</label>
-        <input
-          type="text"
+      <div className="form__input">
+        <label className="label__text">Описание:</label>
+        <textarea
+          className={`input__text ${errors.info ? "error" : ""}`}
           name="info"
           value={formData.info}
           onChange={handleInputChange}
           readOnly={type === modalTypes.ITEM_VIEW && !isEditMode}
+          placeholder="Введите описание"
+          rows={3}
         />
       </div>
 
       {type === modalTypes.ITEM_VIEW && (
-        <div>
+        <div className="button__container">
           {!isEditMode ? (
-            <button type="button" onClick={() => setIsEditMode(true)}>
+            <button
+              type="button"
+              className="button__modal secondary"
+              onClick={() => setIsEditMode(true)}
+            >
               Редактировать
             </button>
           ) : (
             <>
-              <button type="submit">Сохранить</button>
-              <button type="button" onClick={() => setIsEditMode(false)}>
+              <button type="submit" className="button__modal">
+                Сохранить
+              </button>
+              <button
+                type="button"
+                className="button__modal secondary"
+                onClick={() => setIsEditMode(false)}
+              >
                 Отменить
               </button>
             </>
@@ -189,11 +235,15 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
       )}
 
       {(type === modalTypes.ITEM_EDIT || type === modalTypes.ITEM_ADD) && (
-        <div>
-          <button type="submit">
+        <div className="button__container">
+          <button className="button__modal" type="submit">
             {type === modalTypes.ITEM_ADD ? "Добавить" : "Сохранить"}
           </button>
-          <button type="button" onClick={onClose}>
+          <button
+            className="button__modal secondary"
+            type="button"
+            onClick={onClose}
+          >
             Отмена
           </button>
         </div>
@@ -202,10 +252,10 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
   );
 
   const renderActionForm = () => (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Действие:</label>
-        <div>
+    <form className="form__style" onSubmit={handleSubmit}>
+      {/* <div className="form__input">
+        <label className="label__text">Действие:</label>
+        <div className="radio-group">
           <label>
             <input
               type="radio"
@@ -216,66 +266,103 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
             />
             Списать
           </label>
+          <label>
+            <input
+              type="radio"
+              name="actionType"
+              value="transfer"
+              checked={formData.actionType === "transfer"}
+              onChange={handleInputChange}
+            />
+            Переместить
+          </label>
         </div>
-      </div>
+      </div> */}
 
-      <div>
-        <label>Название товара:</label>
+      <div className="form__input">
+        <label className="label__text">Наименование МЦ:</label>
         <input
+          className={`input__text ${errors.name ? "error" : ""}`}
           type="text"
           name="name"
           value={formData.name}
           onChange={handleInputChange}
+          placeholder="Введите наименование МЦ"
         />
+        {errors.name && <span className="error-message">{errors.name}</span>}
       </div>
 
-      <div>
-        <label>Дата списания:</label>
+      <div className="form__input">
+        <label className="label__text">Дата списания:</label>
         <input
+          className={`input__text ${errors.actionDate ? "error" : ""}`}
           type="date"
           name="actionDate"
           value={formData.actionDate}
           onChange={handleInputChange}
         />
+        {errors.actionDate && (
+          <span className="error-message">{errors.actionDate}</span>
+        )}
       </div>
 
-      <div>
-        <label>Причина списания:</label>
+      <div className="form__input">
+        <label className="label__text">Причина списания:</label>
         <textarea
+          className={`input__text ${errors.actionReason ? "error" : ""}`}
           name="actionReason"
           value={formData.actionReason}
           onChange={handleInputChange}
-          rows={3}
+          rows={4}
+          placeholder="Опишите причину списания"
         />
+        {errors.actionReason && (
+          <span className="error-message">{errors.actionReason}</span>
+        )}
       </div>
 
-      <div>
-        <label>ФИО ответственного:</label>
+      <div className="form__input">
+        <label className="label__text">ФИО ответственного:</label>
         <input
+          className={`input__text ${errors.actionPerson ? "error" : ""}`}
           type="text"
           name="actionPerson"
           value={formData.actionPerson}
           onChange={handleInputChange}
+          placeholder="Введите ФИО ответственного лица"
         />
+        {errors.actionPerson && (
+          <span className="error-message">{errors.actionPerson}</span>
+        )}
       </div>
 
-      <div>
-        <button type="button" onClick={onClose}>
+      <div className="button__container">
+        <button type="submit" className="button__modal">
+          Подтвердить списание
+        </button>
+        <button
+          type="button"
+          className="button__modal secondary"
+          onClick={onClose}
+        >
           Отмена
         </button>
-        <button type="submit">Подтвердить</button>
       </div>
     </form>
   );
 
   const renderConfirmForm = () => (
-    <div>
+    <div className="confirm-content">
       <p>
         {formData.confirmMessage || "Вы уверены, что хотите списать товар?"}
       </p>
-      <div>
-        <button onClick={onClose}>Отмена</button>
-        <button onClick={onConfirm}>Да</button>
+      <div className="button__container">
+        <button className="button__modal" onClick={onConfirm}>
+          Да, списать
+        </button>
+        <button className="button__modal secondary" onClick={onClose}>
+          Отмена
+        </button>
       </div>
     </div>
   );

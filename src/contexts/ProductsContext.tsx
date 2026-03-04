@@ -253,41 +253,6 @@ export const ProductsProvider = ({
     [isAdmin, fetchProducts, fetchWrittenOffProducts],
   );
 
-  // Восстановление товара
-  const restoreProduct = useCallback(
-    async (id: string) => {
-      console.log(`🔄 restoreProduct вызван для ID ${id}`);
-
-      if (!isAdmin) {
-        const error = "Только администраторы могут восстанавливать товары";
-        console.error("❌", error);
-        setError(error);
-        throw new Error(error);
-      }
-
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const restoredProduct = await productsApi.restoreProduct(id);
-
-        console.log(`✅ Товар ID ${id} восстановлен:`, restoredProduct);
-
-        // Обновляем оба списка
-        await Promise.all([fetchProducts(), fetchWrittenOffProducts()]);
-
-        return restoredProduct;
-      } catch (error: any) {
-        console.error(`❌ Ошибка восстановления товара ID ${id}:`, error);
-        setError(error.message || "Ошибка восстановления товара");
-        throw error;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [isAdmin, fetchProducts, fetchWrittenOffProducts],
-  );
-
   // Очистка выбранного товара
   const clearSelectedProduct = useCallback(() => {
     setSelectedProduct(null);

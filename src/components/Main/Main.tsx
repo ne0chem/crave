@@ -1,6 +1,5 @@
 import "./Main.css";
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useState } from "react";
 import "./style/main.css";
 import "./style/leftMenu.css";
 import "./style/filter.css";
@@ -14,13 +13,12 @@ import ProductList from "../ProductList/ProductList";
 import UniversalModal from "../Modal/UniversalModal";
 import { ModalType, Room } from "../../types/modal.types";
 import { CreateProductData, ReportOptions } from "../../types/product.types";
-import { reportService } from "../services/reportService"; // 👈 ИСПРАВЛЕНО: было "../services"
-import ReportModal from "../Modal/ReportModal/ReportModal"; // 👈 ИСПРАВЛЕНО: путь к папке
-import WordPreviewModal from "../Modal/ReportModal/WordPreviewModal"; // 👈 ДОБАВЛЕНО: импорт модалки предпросмотра
+import { reportService } from "../services/reportService";
+import ReportModal from "../Modal/ReportModal/ReportModal";
+import WordPreviewModal from "../Modal/ReportModal/WordPreviewModal";
 
 const Main = () => {
   const { logout } = useAuth();
-  const location = useLocation();
   const {
     products,
     writtenOffProducts,
@@ -155,15 +153,6 @@ const Main = () => {
     });
   };
 
-  // Обработчик восстановления товара
-  const handleRestoreClick = (product: any) => {
-    openModal(ModalType.CONFIRM, {
-      message: `Восстановить товар "${product.name}"?`,
-      action: "restore",
-      productId: product.id,
-    });
-  };
-
   // Сохранение нового товара
   const handleAddProduct = (formData: any) => {
     const selectedRoom = rooms.find((room) => room.id === formData.roomId);
@@ -233,18 +222,8 @@ const Main = () => {
     }
 
     openModal(ModalType.CONFIRM, {
-      message: `Товар "${modalState.data?.name}" успешно списан`,
+      message: `МЦ "${modalState.data?.name}" успешно списан`,
     });
-  };
-
-  // Подтверждение действия
-  const handleConfirm = () => {
-    if (modalState.data?.action === "restore") {
-      // TODO: добавить логику восстановления
-      closeModal();
-    } else {
-      closeModal();
-    }
   };
 
   // Обработчик генерации отчета
@@ -252,9 +231,7 @@ const Main = () => {
     const options: ReportOptions = {
       format,
       type: showWrittenOff ? "writtenOff" : "active",
-      title: showWrittenOff
-        ? "Отчет по списанным товарам"
-        : "Отчет по активным товарам",
+      title: showWrittenOff ? "Отчет по списанным МЦ" : "Отчет по активным МЦ",
       showFilters: true,
       showDate: true,
     };
@@ -298,34 +275,6 @@ const Main = () => {
     setPreviewContent(htmlContent);
     setIsPreviewOpen(true);
   };
-  /*переключение из основной страницы*/
-  useEffect(() => {
-    // 1. Сначала проверяем state (для той же вкладки)
-    if (location.state?.selectedSection) {
-      console.log("🔍 Переход по state:", location.state.selectedSection);
-      setSelectedSection(location.state.selectedSection);
-
-      if (showWrittenOff) {
-        setShowWrittenOff(false);
-      }
-
-      window.history.replaceState({}, document.title);
-    }
-    // 2. Потом проверяем URL параметры (для новой вкладки)
-    else {
-      const params = new URLSearchParams(location.search);
-      const sectionFromUrl = params.get("section");
-
-      if (sectionFromUrl) {
-        console.log("🔍 Переход по URL:", sectionFromUrl);
-        setSelectedSection(sectionFromUrl);
-
-        if (showWrittenOff) {
-          setShowWrittenOff(false);
-        }
-      }
-    }
-  }, [location.state, location.search, setSelectedSection, showWrittenOff]);
   return (
     <div className="Main__container">
       {/* Левое меню с секциями */}
@@ -366,10 +315,6 @@ const Main = () => {
                   {writtenOffProducts?.length || 0}
                 </span>
               </p>
-              <p className="written-off-note">
-                Восстановить товар можно нажав кнопку "Восстановить" в карточке
-                товара
-              </p>
             </div>
           )}
         </div>
@@ -403,7 +348,6 @@ const Main = () => {
           onEditClick={handleEditClick}
           onViewClick={handleViewClick}
           onWriteoffClick={handleWriteoffClick}
-          onRestoreClick={showWrittenOff ? handleRestoreClick : undefined}
           getCategoryColor={getCategoryColor}
           showWrittenOff={showWrittenOff}
         />
@@ -422,7 +366,7 @@ const Main = () => {
           </button>
 
           <button
-            className={`toggleViewBtn ${showWrittenOff ? "active" : ""}`}
+            className={`delMZ ${showWrittenOff ? "active" : ""}`}
             onClick={() => setShowWrittenOff(!showWrittenOff)}
           >
             {showWrittenOff ? "Активные МЦ" : "Списанные МЦ"}
@@ -456,7 +400,6 @@ const Main = () => {
             handleEditProduct(data);
           }
         }}
-        onConfirm={handleConfirm}
         onSubmit={handleWriteoff}
       />
 

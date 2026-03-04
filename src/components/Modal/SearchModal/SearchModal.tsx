@@ -191,12 +191,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
                 />
-                <h3 className="search-catalog-title">
-                  {showWrittenOff
-                    ? "Списанные МЦ"
-                    : selectedSection || "Все секции"}{" "}
-                  ({filteredProducts.length})
-                </h3>
               </div>
 
               <div className="search-products-list">

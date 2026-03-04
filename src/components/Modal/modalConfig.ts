@@ -4,16 +4,16 @@ export const modalTypes = ModalType;
 
 export const modalConfig: ModalConfigMap = {
   [ModalType.ITEM_VIEW]: {
-    title: "Просмотр товара",
+    title: "Просмотр МЦ",
   },
   [ModalType.ITEM_EDIT]: {
-    title: "Редактирование товара",
+    title: "Редактирование МЦ",
   },
   [ModalType.ITEM_ADD]: {
-    title: "Добавление товара",
+    title: "Добавление МЦ",
   },
   [ModalType.ACTION]: {
-    title: "Списание товара",
+    title: "Списание МЦ",
   },
   [ModalType.CONFIRM]: {
     title: "Подтверждение",

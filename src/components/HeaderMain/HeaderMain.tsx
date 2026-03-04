@@ -18,7 +18,7 @@ export default function HeaderMain() {
         </div>
 
         <nav className="sections-nav">
-          <Link
+          {/* <Link
             to="/catalog"
             state={{
               selectedSection: "Административно-управленческая (служебная)",
@@ -42,7 +42,7 @@ export default function HeaderMain() {
             className="section-link"
           >
             Сценографическая
-          </Link>
+          </Link> */}
 
           <button className="section-link stock-btn">Склад</button>
         </nav>

@@ -1,5 +1,3 @@
-/* src/components/Modal/SearchModal/SearchModal.css */
-
 .search-modal-overlay {
   position: fixed;
   top: 0;
@@ -15,39 +13,36 @@
 
 .search-modal {
   position: relative;
-  background: white;
-  width: 95vw;
-  height: 90vh;
-  border-radius: 16px;
+  background: var(--bg-primary);
+  width: 50vw;
+  height: 80vh;
+  border-radius: var(--border-radius);
   display: flex;
   flex-direction: column;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   overflow: hidden;
 }
 
 .search-modal-header {
-  padding: 20px 24px;
-  border-bottom: 1px solid #e9ecef;
+  padding: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: var(--text-primary);
 }
 
 .search-modal-header h2 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: var(--fz-title);
   font-weight: 600;
-  color: white;
+  color: var(--text-primary);
   letter-spacing: 0.5px;
 }
 
 .close-btn {
-  background: rgba(255, 255, 255, 0.2);
   border: none;
   font-size: 28px;
   cursor: pointer;
-  color: white;
+  color: var(--text-primary);
   width: 40px;
   height: 40px;
   display: flex;
@@ -60,14 +55,13 @@
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--accent-gray);
   transform: rotate(90deg);
 }
 
 .search-modal-content {
   flex: 1;
   overflow: hidden;
-  background-color: #f8f9fa;
 }
 
 .search-modal-layout {
@@ -77,139 +71,30 @@
 
 /* Левое меню */
 .search-left-menu {
-  width: 280px;
-  background: white;
+  width: 25rem;
   padding: 20px;
   overflow-y: auto;
-  border-right: 1px solid #e9ecef;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.02);
 }
 
 .left-category {
-  padding: 12px 16px;
-  margin: 4px 0;
-  border-radius: 10px;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: all 0.2s;
-  font-weight: 500;
-  color: #495057;
-  border: 1px solid transparent;
-}
-
-.left-category:hover {
-  background-color: #f1f3f5;
-  border-color: #dee2e6;
-  transform: translateX(4px);
-}
-
-.left-category.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
-}
-
-.section-count {
-  background-color: #e9ecef;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #495057;
-  transition: all 0.2s;
-}
-
-.left-category.active .section-count {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-}
-
-.written-off-info {
-  padding: 20px;
-  background: linear-gradient(135deg, #fff5f5 0%, #ffe3e3 100%);
-  border-radius: 12px;
-  border-left: 4px solid #dc3545;
-}
-
-.written-off-info .left-category.active {
-  background: #dc3545;
-  margin-bottom: 12px;
 }
 
 /* Центральная часть */
 .search-catalog {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding: 24px;
-  background-color: #f8f9fa;
+  width: 48rem;
 }
-
 .search-catalog-header {
-  margin-bottom: 20px;
-  background: white;
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  margin-bottom: 1rem;
 }
-
-.search-input {
-  width: 100%;
-  padding: 14px 20px;
-  border: 2px solid #e9ecef;
-  border-radius: 30px;
-  font-size: 16px;
-  margin-bottom: 15px;
-  transition: all 0.3s;
-  background-color: white;
-  padding-left: 45px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: 15px center;
-  background-size: 20px;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-}
-
-.search-catalog-title {
-  margin: 0;
-  font-size: 1.2rem;
-  color: #495057;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.search-catalog-title::before {
-  content: "📋";
-  font-size: 1.4rem;
-}
-
-.search-products-list {
-  flex: 1;
-  overflow-y: auto;
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-}
-
 /* Правое меню */
 .search-right-menu {
   width: 320px;
-  background: white;
   padding: 24px;
   overflow-y: auto;
-  border-left: 1px solid #e9ecef;
-  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.02);
 }
 
 .search-actions {
@@ -220,59 +105,47 @@
 }
 
 .toggle-view-btn {
-  width: 100%;
+  width: 90%;
   padding: 14px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
-  color: white;
-  font-size: 15px;
+  background: var(--hover-gray);
+  color: var(--text-primary);
+  font-size: var(--fz-dop);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 10px rgba(108, 117, 125, 0.3);
+  margin-left: 1.5rem;
 }
 
 .toggle-view-btn.active {
-  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-  box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+  background: var(--hover-gray);
 }
 
 .toggle-view-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  transform: var(--transformY);
 }
 
 .report-btn {
-  width: 100%;
+  width: 90%;
   padding: 14px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #28a745 0%, #218838 100%);
-  color: white;
-  font-size: 15px;
+  background: var(--input-bg);
+  color: var(--text-primary);
+  font-size: var(--fz-dop);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.report-btn::before {
-  content: "📊";
-  font-size: 1.2rem;
+  margin-left: 1.5rem;
 }
 
 .report-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(40, 167, 69, 0.4);
 }
 
 /* Стили для вложенных модалок */
