@@ -1,0 +1,160 @@
+/* src/components/Modal/WordPreviewModal.css */
+.word-preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
+
+.word-preview-modal {
+  background: white;
+  border-radius: 12px;
+  width: 900px;
+  max-width: 95%;
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+.word-preview-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.word-preview-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #999;
+  padding: 0 8px;
+}
+
+.close-btn:hover {
+  color: #333;
+}
+
+.word-preview-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background-color: #f8f9fa;
+}
+
+.word-preview-html {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: "Times New Roman", serif;
+}
+
+/* Стили для HTML-контента */
+.word-preview-html h1 {
+  color: #0066cc;
+  border-bottom: 2px solid #0066cc;
+  padding-bottom: 10px;
+}
+
+.word-preview-html table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.word-preview-html th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.word-preview-html td {
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+}
+
+.word-preview-html .written-off {
+  background-color: #fff0f0;
+}
+
+.word-preview-html .filter-info {
+  background: #f8f9fa;
+  padding: 15px;
+  border-left: 4px solid #0066cc;
+  margin-bottom: 20px;
+}
+
+.word-preview-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.preview-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+}
+
+.preview-icon {
+  font-size: 1.5rem;
+}
+
+.preview-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.cancel-btn {
+  padding: 8px 16px;
+  border: 1px solid #ccc;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.download-btn {
+  padding: 8px 20px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.download-btn:hover {
+  background: #218838;
+}
+
+.preview-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #666;
+  font-size: 1.2rem;
+}

@@ -1,0 +1,10 @@
+.Main__container {
+  display: flex;
+  height: 80vh;
+  gap: 2rem;
+}
+.filter__conteiner {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}

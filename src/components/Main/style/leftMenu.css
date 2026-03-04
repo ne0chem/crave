@@ -1,0 +1,125 @@
+.left__section {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 40rem;
+}
+.left-menu {
+  padding: 1rem;
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.link__btn {
+  width: 100%;
+}
+.btn__link {
+  width: 100%;
+  max-width: 35rem;
+  padding: 1rem 1.5rem;
+  font-size: var(--fz--osnova);
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-primary);
+  background-color: var(--hover-gray);
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 4rem;
+  display: inline-block;
+  text-decoration: none;
+}
+.btn__link:hover {
+  background-color: var(--accent-gray);
+  transform: var(--transformY);
+}
+.btn__link:active {
+  transform: translateY(0);
+}
+.left-category {
+  cursor: pointer;
+  padding: 1rem 1.5rem;
+  margin: 0;
+  border-radius: calc(var(--border-radius) / 1.5);
+  background-color: var(--input-bg);
+  transition: all 0.2s ease;
+  font-weight: normal;
+  color: var(--text-primary);
+  position: relative;
+  overflow: hidden;
+}
+.left-category.section-item {
+  background-color: transparent;
+  border-left: none;
+  font-size: var(--fz--osnova);
+  font-weight: 600;
+}
+.left-category.section-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--section-color);
+  opacity: 0.2;
+
+  transition: opacity 0.2s ease;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.left-category.section-item:hover {
+  transform: var(--transformR);
+}
+
+.left-category.active {
+  font-weight: bold;
+  border-left: 10px solid var(--section-color);
+}
+
+.left-category span,
+.left-category .section-count {
+  position: relative;
+  z-index: 1;
+}
+
+.left-category:first-child {
+  background-color: var(--hover-gray);
+  color: var(--text-primary);
+  border: none;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  font-size: var(--fz--osnova);
+}
+
+.left-category:first-child:hover {
+  background-color: var(--accent-gray);
+  transform: var(--transformR);
+}
+
+/* Количество товаров в секции */
+.section-count {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.2rem 0.6rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .left-menu {
+    width: 160px;
+    padding: 0.8rem;
+  }
+
+  .left-category {
+    padding: 0.8rem 1.2rem;
+    font-size: 0.9rem;
+  }
+}

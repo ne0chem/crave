@@ -1,0 +1,263 @@
+/* UniversalModal.css */
+
+/* Модальное окно */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background-color: var(--bg-container);
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+  color: var(--text-primary);
+  font-size: var(--fz-title);
+  margin: 0;
+  font-weight: 500;
+}
+
+.close {
+  font-size: 2.5rem;
+  font-weight: 300;
+  cursor: pointer;
+  color: var(--hover-gray);
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.close:hover {
+  color: var(--accent-gray);
+  transform: var(--transformR);
+}
+
+/* Формы */
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  color: var(--text-primary);
+  font-size: var(--fz--osnova);
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: calc(var(--border-radius) / 2);
+  padding: 0.8rem 1rem;
+  font-size: var(--fz--osnova);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent-gray);
+  box-shadow: 0 0 0 2px rgba(124, 132, 138, 0.1);
+}
+
+.form-group input:read-only,
+.form-group select:disabled {
+  background-color: var(--bg-primary);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Радио группа */
+.radio-group {
+  display: flex;
+  gap: 2rem;
+  padding: 0.5rem 0;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--fz--osnova);
+  cursor: pointer;
+}
+
+.radio-group input[type="radio"] {
+  width: auto;
+  margin-right: 0.5rem;
+  accent-color: var(--accent-gray);
+}
+
+/* Кнопки */
+.buttons-container,
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+button {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: calc(var(--border-radius) / 2);
+  font-size: var(--fz--osnova);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: var(--hover-gray);
+  color: white;
+  font-weight: 500;
+}
+
+button:hover {
+  background-color: var(--accent-gray);
+  transform: var(--transformY);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Специфические кнопки */
+.edit-button {
+  background-color: var(--hover-gray);
+}
+
+.save-button {
+  background-color: var(--accent-gray);
+}
+
+.cancel-button {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.cancel-button:hover {
+  background-color: var(--hover-gray);
+  color: white;
+}
+
+.confirm-button {
+  background-color: var(--accent-gray);
+}
+
+/* Контент подтверждения */
+.confirm-content {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.confirm-content p {
+  font-size: var(--fz--osnova);
+  color: var(--text-primary);
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 1.5rem;
+    width: 95%;
+  }
+
+  .modal-header h2 {
+    font-size: calc(var(--fz-title) * 0.9);
+  }
+
+  .buttons-container,
+  .modal-buttons {
+    flex-direction: column;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .radio-group {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* Стили для выпадающего списка (select) */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+}
+
+/* Стили для даты */
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+/* Скроллбар */
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background: var(--hover-gray);
+  border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-gray);
+}

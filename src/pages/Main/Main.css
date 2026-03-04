@@ -1,0 +1,12 @@
+.main-page {
+  border: 1px solid red;
+  height: 98vh;
+}
+
+.main-content {
+  border: 1px solid blue;
+}
+.logo {
+  border: 1px solid red;
+  height: 8rem;
+}

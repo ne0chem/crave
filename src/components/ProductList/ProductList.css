@@ -1,0 +1,195 @@
+.products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  max-height: 680px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-gray) var(--border-color);
+}
+
+.products-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.products-list::-webkit-scrollbar-track {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.products-list::-webkit-scrollbar-thumb {
+  background: var(--accent-gray);
+  border-radius: var(--border-radius);
+  border: 2px solid var(--border-color);
+}
+
+.products-list::-webkit-scrollbar-thumb:hover {
+  background: var(--input-bg);
+}
+
+.product-container {
+  margin-bottom: 0;
+  border-radius: var(--border-radius);
+  transition: all 0.2s ease;
+}
+
+.product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 1.5rem;
+  background-color: var(--input-bg);
+  border-radius: var(--border-radius);
+  border: 1px solid transparent;
+  border-left-width: 1.2rem; /* Для цветного бордера */
+  border-left-style: solid;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.product-item:hover {
+  background-color: var(--border-color);
+  border-color: var(--accent-gray);
+  transform: var(--transformY);
+}
+
+.product-item.active {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+  background-color: var(--border-color);
+}
+
+.product-name {
+  font-size: var(--fz--osnova);
+  color: var(--text-primary);
+  font-weight: 600;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  padding-right: 1rem;
+  flex: 1;
+}
+
+.product-price {
+  font-size: var(--fz--osnova);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+}
+
+.product-details {
+  padding: 1.5rem 2rem;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-top: none;
+  border-left-width: 1.2rem;
+  border-left-style: solid;
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
+  animation: slideDown 0.2s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Детали информации */
+.product-details p {
+  margin: 0.1rem 0;
+  font-size: var(--fz--osnova);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.product-details p:first-child {
+  margin-top: 0;
+}
+
+.product-details p:last-child {
+  margin-bottom: 0;
+}
+
+.product-details strong {
+  color: var(--text-primary);
+  font-weight: 600;
+  min-width: 170px;
+  display: inline-block;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.details-header h4 {
+  margin: 0;
+  font-size: var(--fz--osnova);
+  color: var(--text-primary);
+}
+
+/* Кнопка редактирования */
+.edit-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: var(--text-secondary);
+}
+
+.edit-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--accent-gray);
+  transform: scale(1.1);
+}
+
+.edit-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.details-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.details-actions {
+  display: flex;
+  flex-direction: column;
+}
+.eddit,
+.spisanie {
+  display: flex;
+  justify-content: space-between;
+}
+.icons-eddit {
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 2rem;
+}
+.button__edit {
+  background: #00000000;
+  width: 4rem;
+  height: 4rem;
+}

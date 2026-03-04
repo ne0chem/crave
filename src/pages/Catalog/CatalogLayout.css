@@ -1,0 +1,36 @@
+/* CatalogLayout.css */
+
+.catalog-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.catalog-container {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+}
+
+/* Левая и правая колонки по 10% */
+.catalog-content {
+  flex: 1 1 10%;
+  min-width: 0; /* Предотвращает переполнение */
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Центральная колонка 80% */
+.catalog-main {
+  flex: 8 8 30%;
+  min-width: 0; /* Предотвращает переполнение */
+}

@@ -1,25 +1,57 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+// App.tsx
+import { Routes, Route, Navigate } from "react-router-dom";
+// import { useAuth } from "./contexts/AuthContext";
+import { useAuth } from "./contexts/DummyAuthContext";
+import Auth from "./pages/Auth/Auth";
+import MainPage from "./pages/Main/Main";
+import CatalogLayout from "./pages/Catalog/CatalogLayout"; // ← исправил путь
+import "./App.css";
+
+// const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+//   const { token, isLoading } = useAuth();
+
+//   if (isLoading) {
+//     return <div className="loading-page">Загрузка...</div>;
+//   }
+
+//   if (!token) {
+//     return <Navigate to="/login" replace />;
+//   }
+
+//   return <>{children}</>;
+// };
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Routes>
+      <Route path="/login" element={<Auth />} />
+
+      {/* Все маршруты каталога обернуты в ProtectedRoute и CatalogLayout */}
+      <Route
+        element={
+          // <ProtectedRoute>
+          <CatalogLayout />
+          // </ProtectedRoute>
+        }
+      >
+        <Route path="/catalog" element={<div>Категория 1</div>} />{" "}
+        {/* основной каталог */}
+        <Route path="/catalog/category1" element={<div>Категория 1</div>} />
+        <Route path="/catalog/category2" element={<div>Категория 2</div>} />
+        <Route path="/catalog/category3" element={<div>Категория 3</div>} />
+      </Route>
+
+      <Route
+        path="/main"
+        element={
+          // <ProtectedRoute>
+          <MainPage />
+          // </ProtectedRoute>
+        }
+      />
+
+      <Route path="/" element={<Navigate to="/main" replace />} />
+    </Routes>
   );
 }
 

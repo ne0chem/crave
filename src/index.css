@@ -1,13 +1,97 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@font-face {
+  font-family: "IBMPlexSans";
+  src: url("./fonts/IBMPlexSans-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@font-face {
+  font-family: "IBMPlexSans";
+  src: url("./fonts/IBMPlexSans-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+html,
+body {
+  font-family:
+    "IBMPlexSans",
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    "Roboto",
+    sans-serif;
+  font-weight: 400;
+  color: var(--color-text);
+  background-color: var(--bg-primary);
+  font-size: 62.5%;
+  font-weight: normal;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  padding: 0;
+  margin: 0;
+}
+
+button,
+input {
+  outline: none;
+  border: none;
+  cursor: pointer;
+}
+
+.container {
+  width: 150rem;
+  margin: 0 auto;
+}
+:root {
+  /*цвета страниц и контейнера*/
+  --bg-primary: #a0a0a0; /* фон всей страницы */
+  --bg-primary: #b6b4b4;
+  --bg-container: #eeecec; /* фон элементов на странице( модалок и тд) */
+  --border-color: #eeecec; /* Светло-серый для границ */
+  --border-radius: 1.2rem; /* Радиус скругления углов */
+
+  /*стили списка и инпутов*/
+  --input-bg: #fafafa; /* Фон инпутов */
+
+  /*цвета кнопок и активные состояния*/
+
+  --hover-gray: #7c848a; /* обычное состояние */
+  --accent-gray: #999ea3; /*при наведении*/
+
+  --input-bg: #fafafa; /* Фон инпутов и светлых кнопок*/
+  --border-color: #e0e0e0; /* активное состояния при наведении на кнопку  */
+
+  /*цвет текста*/
+  --text-primary: #1a1a1a; /* Черный для заголовков */
+  --fz-title: 2rem; /* Заголовки */
+  --fz--osnova: 1.5rem; /* Основной размер текста */
+  --fz-dop: 1.2rem; /* Дополнительный размер текста */
+
+  /*трансформация */
+  --transformR: translateX(5px); /*сдвиг вправо*/
+  --transformY: translateY(-2px); /*свдиг вверх*/
 }

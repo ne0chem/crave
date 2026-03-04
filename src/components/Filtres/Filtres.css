@@ -1,0 +1,238 @@
+.poisk {
+  width: 25rem;
+  box-sizing: border-box;
+  background-color: var(--bg-container);
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  margin: 0 auto;
+}
+
+.filter-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0 0 1.5rem 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.filter-item {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.filter-item:last-child {
+  border-bottom: none;
+}
+
+.filter-trigger {
+  display: block;
+  width: 100%;
+  padding: 1rem 1.2rem;
+  background-color: var(--bg-container);
+  border: none;
+  color: var(--text-secondary);
+  font-size: var(--fz--osnova);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  position: relative;
+  text-align: left;
+  border-bottom: 1px solid transparent;
+  font-weight: 600;
+}
+
+/* Контент фильтра - появляется внутри потока */
+.filter-content {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  background-color: var(--input-bg);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.filter-content.active {
+  max-height: 500px;
+  opacity: 1;
+  padding: 1.2rem;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Поля ввода */
+.filter-input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  margin-bottom: 1rem;
+  background-color: var(--bg-container);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  color: var(--text-primary);
+  font-size: var(--fz-dop);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: var(--accent-gray);
+  background-color: var(--bg-container);
+}
+
+.filter-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.price-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.price-input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background-color: var(--bg-container);
+  border: 1px solid var(--border-color);
+  border-radius: calc(var(--border-radius) / 2);
+  color: var(--text-primary);
+  font-size: var(--fz-dop);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.price-input:focus {
+  outline: none;
+  border-color: var(--accent-gray);
+  background-color: var(--bg-container);
+}
+
+.price-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+/* Сортировка */
+.sort-options {
+  padding: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.sort-link {
+  display: block;
+  padding: 0.8rem 1rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: var(--fz-dop);
+  transition: all 0.2s ease;
+  border-radius: var(--border-radius);
+  background-color: var(--bg-container);
+  border: 1px solid var(--border-color);
+}
+
+.sort-link:hover {
+  color: var(--accent-gray);
+  background-color: var(--input-bg);
+  border-color: var(--accent-gray);
+}
+
+/* Список категорий и помещений */
+.filter-list {
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background-color: var(--bg-container);
+}
+
+.filter-list-item {
+  padding: 0.8rem 1rem;
+  color: var(--text-secondary);
+  font-size: var(--fz-dop);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.filter-list-item:last-child {
+  border-bottom: none;
+}
+
+.filter-list-item:hover {
+  background-color: var(--input-bg);
+  color: var(--text-primary);
+  padding-left: 1.5rem;
+}
+
+/* Кастомный скроллбар для списков */
+.filter-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filter-list::-webkit-scrollbar-track {
+  background: var(--input-bg);
+  border-radius: 3px;
+}
+
+.filter-list::-webkit-scrollbar-thumb {
+  background: var(--accent-gray);
+  border-radius: 3px;
+}
+
+.filter-list::-webkit-scrollbar-thumb:hover {
+  background: var(--hover-gray);
+}
+
+/* Поисковая панель с кнопками */
+.search-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: stretch;
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+
+.newtype2 {
+  width: 100%;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: var(--fz--osnova);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.newtype2 {
+  background-color: var(--hover-gray);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.newtype2:hover {
+  background-color: var(--accent-gray);
+  color: var(--text-primary);
+  transform: var(--transformY);
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
