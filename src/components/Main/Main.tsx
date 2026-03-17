@@ -1,10 +1,10 @@
 import "./Main.css";
-import { useState } from "react";
+import { useState, useEffect } from "react"; // 👈 Добавляем useEffect
 import "./style/main.css";
 import "./style/leftMenu.css";
 import "./style/filter.css";
 import { useProducts } from "../../contexts/ProductsContext";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom"; // 👈 Добавляем useLocation
 import { useAuth } from "../../contexts/DummyAuthContext";
 import Filtres from "../Filtres/Filtres";
 import { useProductFilters } from "../../hooks/useProductFilters";
@@ -19,6 +19,8 @@ import WordPreviewModal from "../Modal/ReportModal/WordPreviewModal";
 
 const Main = () => {
   const { logout } = useAuth();
+  const location = useLocation(); // 👈 Получаем location для доступа к state
+
   const {
     products,
     writtenOffProducts,
@@ -30,8 +32,8 @@ const Main = () => {
   // Состояния
   const [showWrittenOff, setShowWrittenOff] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false); // 👈 ДОБАВЛЕНО
-  const [previewContent, setPreviewContent] = useState(""); // 👈 ДОБАВЛЕНО
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewContent, setPreviewContent] = useState("");
 
   // Выбираем какой массив показывать
   const currentProducts = showWrittenOff ? writtenOffProducts : products;
@@ -40,6 +42,17 @@ const Main = () => {
   const colors = useProductColors(currentProducts);
 
   const [openProductId, setOpenProductId] = useState<string | null>(null);
+
+  // 👈 Эффект для установки выбранной секции из state при загрузке
+  useEffect(() => {
+    // Проверяем, есть ли переданная секция в state
+    if (location.state?.selectedSection) {
+      filters.setSelectedSection(location.state.selectedSection);
+      // Очищаем state, чтобы при обновлении страницы секция не сбрасывалась
+      // но при этом не применялась снова при возврате на страницу
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]); // Зависимость от location.state
 
   // Состояние для модалки
   const [modalState, setModalState] = useState<{
@@ -275,6 +288,7 @@ const Main = () => {
     setPreviewContent(htmlContent);
     setIsPreviewOpen(true);
   };
+
   return (
     <div className="Main__container">
       {/* Левое меню с секциями */}
@@ -408,7 +422,7 @@ const Main = () => {
         isOpen={isReportModalOpen}
         onClose={() => setIsReportModalOpen(false)}
         onGenerate={handleGenerateReport}
-        onPreview={handlePreviewWord} // 👈 ДОБАВЛЕНО
+        onPreview={handlePreviewWord}
         itemCount={filteredProducts.length}
       />
 

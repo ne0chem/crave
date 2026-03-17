@@ -470,5 +470,293 @@
       "reason": "fffff",
       "deleted_at": "2026-03-02T15:58:53.826Z"
     }
+  ],
+  "report__inventory": [
+    {
+      "report_id": "fb16db2a-07cc-435e-b4a5-e304b1e1f0ab",
+      "date": "2026-02-11 15:38:26",
+      "rooms": [
+        {
+          "room_id": "9a3a739a-2d0f-4e2b-82cf-7d87a74cb260",
+          "room_number": "44/2",
+          "room_name": "Кабинет врача",
+          "section": "Административно-управленческая (служебная)",
+          "correct-item": [
+            {
+              "id": "corr-001",
+              "name": "Кушетка медицинская",
+              "inventory_tools_type": "Медицинское оборудование",
+              "description": "Регулируемая кушетка",
+              "inv_number": "789",
+              "price": 15000,
+              "rfid": "RFID789012",
+              "created_at": "2025-01-15T10:00:00",
+              "updated_at": null
+            },
+            {
+              "id": "corr-002",
+              "name": "Шкаф медицинский",
+              "inventory_tools_type": "Мебель",
+              "description": "Для хранения медикаментов",
+              "inv_number": "790",
+              "price": 12000,
+              "rfid": "RFID790123",
+              "created_at": "2025-01-15T10:05:00",
+              "updated_at": null
+            }
+          ],
+          "missing-item": [
+            {
+              "id": "aae4a431-fcea-4cde-a656-b9b1962dfbe4",
+              "name": "Тумбочка выкатная",
+              "inventory_tools_type": "Мебель",
+              "description": "Выкатная тумба с колесиками",
+              "inv_number": "753",
+              "price": 3500,
+              "rfid": null,
+              "room_name": "Кабинет врача",
+              "room_number": "44/2",
+              "created_at": "2025-07-17T13:04:59.836429",
+              "updated_at": null,
+              "expected_room": "44/2",
+              "current_location": "Не найдено"
+            },
+            {
+              "id": "miss-002",
+              "name": "Стетоскоп",
+              "inventory_tools_type": "Медицинское оборудование",
+              "description": "Комплексный стетоскоп",
+              "inv_number": "754",
+              "price": 2500,
+              "rfid": "RFID754321",
+              "room_name": "Кабинет врача",
+              "room_number": "44/2",
+              "created_at": "2025-06-10T09:30:00",
+              "updated_at": null,
+              "expected_room": "44/2",
+              "current_location": "Не найдено"
+            }
+          ],
+          "wrong-room-item": [
+            {
+              "id": "wrong-001",
+              "name": "Тонометр",
+              "inventory_tools_type": "Медицинское оборудование",
+              "description": "Автоматический тонометр",
+              "inv_number": "701",
+              "price": 3200,
+              "rfid": "RFID701234",
+              "room_name": "Процедурный кабинет",
+              "room_number": "45",
+              "created_at": "2025-03-20T14:20:00",
+              "updated_at": null,
+              "found_in_room": "44/2",
+              "expected_room": "45"
+            },
+            {
+              "id": "wrong-002",
+              "name": "Стул офисный",
+              "inventory_tools_type": "Мебель",
+              "description": "Черный офисный стул",
+              "inv_number": "500798c4-5006",
+              "price": 4500,
+              "rfid": null,
+              "room_name": "Ординаторская",
+              "room_number": "43",
+              "created_at": "2025-02-05T11:15:00",
+              "updated_at": null,
+              "found_in_room": "44/2",
+              "expected_room": "43"
+            }
+          ]
+        }
+      ],
+      "wrong-room-item": [
+        {
+          "report_id": "f8e23f0e-a51b-480d-9532-66e789918b7c",
+          "date": "2026-02-11 15:37:59",
+          "rooms": [
+            {
+              "room_id": "room-101",
+              "room_number": "45",
+              "room_name": "Процедурный кабинет",
+              "correct-item": [
+                {
+                  "id": "corr-101",
+                  "name": "Холодильник фармацевтический",
+                  "inventory_tools_type": "Оборудование",
+                  "description": "Для хранения вакцин",
+                  "inv_number": "901",
+                  "price": 25000,
+                  "rfid": "RFID901234"
+                }
+              ],
+              "missing-item": [
+                {
+                  "id": "miss-101",
+                  "name": "Шприцы одноразовые (набор)",
+                  "inventory_tools_type": "Расходные материалы",
+                  "description": "Набор шприцов 2ml, 5ml, 10ml",
+                  "inv_number": "902",
+                  "price": 1200,
+                  "rfid": null,
+                  "expected_room": "45",
+                  "current_location": "Не найдено"
+                }
+              ],
+              "wrong-room-item": []
+            }
+          ],
+          "wrong-room-item": []
+        },
+        {
+          "report_id": "b7ee4be2-e416-4e5c-be5f-409418cb76fa",
+          "date": "2025-11-28 18:05:00",
+          "rooms": [
+            {
+              "room_id": "room-201",
+              "room_number": "46",
+              "room_name": "Кабинет заведующего",
+              "correct-item": [
+                {
+                  "id": "corr-201",
+                  "name": "Стол письменный",
+                  "inventory_tools_type": "Мебель",
+                  "description": "Дубовый стол",
+                  "inv_number": "801",
+                  "price": 8500,
+                  "rfid": "RFID801234"
+                },
+                {
+                  "id": "corr-202",
+                  "name": "Компьютер",
+                  "inventory_tools_type": "Компьютерная техника",
+                  "description": "Моноблок HP",
+                  "inv_number": "802",
+                  "price": 35000,
+                  "rfid": "RFID802345"
+                }
+              ],
+              "missing-item": [
+                {
+                  "id": "miss-201",
+                  "name": "Лампа настольная",
+                  "inventory_tools_type": "Освещение",
+                  "description": "Светодиодная лампа",
+                  "inv_number": "803",
+                  "price": 1200,
+                  "rfid": null,
+                  "expected_room": "46",
+                  "current_location": "Не найдено"
+                }
+              ],
+              "wrong-room-item": [
+                {
+                  "id": "wrong-201",
+                  "name": "Градусник комнатный",
+                  "inventory_tools_type": "Прочее",
+                  "description": "Электронный термометр",
+                  "inv_number": "450",
+                  "price": 500,
+                  "rfid": null,
+                  "room_name": "Склад",
+                  "room_number": "50",
+                  "found_in_room": "46",
+                  "expected_room": "50"
+                }
+              ]
+            }
+          ],
+          "wrong-room-item": [
+            {
+              "id": "wrong-item-34-1",
+              "name": "Вешалка напольная",
+              "inventory_tools_type": "Мебель",
+              "description": "Напольная вешалка для одежды",
+              "inv_number": "234",
+              "price": 1800,
+              "rfid": null,
+              "room_name": "Холл",
+              "room_number": "0",
+              "found_in_room": "46"
+            },
+            {
+              "id": "wrong-item-34-2",
+              "name": "Огнетушитель",
+              "inventory_tools_type": "Пожарная безопасность",
+              "description": "Порошковый огнетушитель",
+              "inv_number": "567",
+              "price": 1500,
+              "rfid": "RFID567890",
+              "room_name": "Коридор",
+              "room_number": "0",
+              "found_in_room": "46"
+            }
+          ]
+        },
+        {
+          "report_id": "35014d78-d0d3-4be2-9bc2-07c692ee9be3",
+          "date": "2025-11-28 17:37:55",
+          "rooms": [
+            {
+              "room_id": "room-301",
+              "room_number": "47",
+              "room_name": "Лаборатория",
+              "correct-item": [
+                {
+                  "id": "corr-301",
+                  "name": "Микроскоп",
+                  "inventory_tools_type": "Лабораторное оборудование",
+                  "description": "Бинокулярный микроскоп",
+                  "inv_number": "MIC-001",
+                  "price": 45000,
+                  "rfid": "RFID001MIC"
+                }
+              ],
+              "missing-item": [
+                {
+                  "id": "miss-301",
+                  "name": "Пробирки стеклянные (набор)",
+                  "inventory_tools_type": "Лабораторная посуда",
+                  "description": "Набор пробирок 10шт",
+                  "inv_number": "PR-023",
+                  "price": 800,
+                  "rfid": null,
+                  "expected_room": "47",
+                  "current_location": "Не найдено"
+                }
+              ],
+              "wrong-room-item": []
+            }
+          ],
+          "wrong-room-item": [
+            {
+              "id": "wrong-item-14-1",
+              "name": "Халат лабораторный",
+              "inventory_tools_type": "Спецодежда",
+              "description": "Белый халат, размер L",
+              "inv_number": "CL-045",
+              "price": 1200,
+              "rfid": null,
+              "room_name": "Гардероб",
+              "room_number": "12",
+              "found_in_room": "47"
+            },
+            {
+              "id": "wrong-item-14-2",
+              "name": "Перчатки нитриловые (коробка)",
+              "inventory_tools_type": "Расходные материалы",
+              "description": "Коробка перчаток размер M",
+              "inv_number": "GL-678",
+              "price": 450,
+              "rfid": null,
+              "room_name": "Склад расходников",
+              "room_number": "49",
+              "found_in_room": "47"
+            }
+          ]
+        }
+      ]
+    }
   ]
 }

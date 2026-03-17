@@ -1,16 +1,6 @@
-import "./Main.css";
-import HeaderMain from "../../components/HeaderMain/HeaderMain";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import React, { useState, useEffect, useMemo } from "react";
-import ProductList from "../../components/ProductList/ProductList";
-import InventoryRoomModal from "../../components/Modal/InventoryRoomModal/InventoryRoomModal";
-import { useProducts } from "../../contexts/ProductsContext";
-import { useProductColors } from "../../hooks/useProductColors";
-import { useInventoryReport } from "../../hooks/useInventoryReport";
-import { Product } from "../../types/product.types";
-// import { ROOMS, Room } from "../../constants/rooms";
+// src/constants/rooms.ts
 
-interface Room {
+export interface Room {
   id: string;
   name: string;
   left: string;
@@ -18,10 +8,8 @@ interface Room {
   width: string;
   height: string;
   roomNumber: string;
-  zIndex?: string;
 }
 
-// 👇 МАССИВ ПРЯМО В КОМПОНЕНТЕ
 export const ROOMS: Room[] = [
   //склад
   {
@@ -52,154 +40,126 @@ export const ROOMS: Room[] = [
     height: "80px",
     roomNumber: "2.3",
   },
-  //2 этаж (готов)
-
+  //2 этаж
   {
     id: "0e62d7df-f095-408d-aa39-971ae04f726f",
     name: "Коридор",
-    left: "1047px",
-    top: "355px",
-    width: "13px",
-    height: "75px",
+    left: "20%",
+    top: "30%",
+    width: "120px",
+    height: "80px",
     roomNumber: "2.1",
   },
-
-  {
-    id: "0e62d7df-f095-408d-aa39-971ae04f726f",
-    name: "Коридор",
-    left: "951px",
-    top: "430px",
-    width: "52px",
-    height: "20px",
-    roomNumber: "2.1",
-  },
-
   {
     id: "353fe49d-008a-47cc-8a12-33cebca6b2d2",
     name: "Кухня",
-    left: "1059px",
-    top: "355px",
-    width: "34px",
-    height: "56px",
+    left: "20%",
+    top: "30%",
+    width: "120px",
+    height: "80px",
     roomNumber: "2.2",
   },
-
   {
     id: "a0e6c9cd-31ba-44c1-bb88-9630a2b5c182",
     name: "Репетиционный зал",
-    left: "951px",
-    top: "355px",
-    width: "97px",
-    height: "75px",
+    left: "20%",
+    top: "30%",
+    width: "120px",
+    height: "80px",
     roomNumber: "2.3",
   },
   {
     id: "5b428404-d194-4794-97ae-7b2b34738c9b",
     name: "Костюмерная",
-    left: "1059px",
-    top: "410px",
-    width: "34px",
-    height: "20px",
+    left: "20%",
+    top: "30%",
+    width: "120px",
+    height: "80px",
     roomNumber: "2.4",
   },
-
   {
     id: "885bbc53-0bb0-477d-8dcb-0db76ac994fa",
     name: "Санузел",
-    left: "951px",
-    top: "465px",
-    width: "32px",
-    height: "50px",
+    left: "20%",
+    top: "30%",
+    width: "120px",
+    height: "80px",
     roomNumber: "2.5",
   },
   {
     id: "4e0e176d-bd70-4c39-985e-29ba96ea0483",
     name: "Кабинет",
-    left: "1058px",
-    top: "469px",
-    width: "17px",
-    height: "13px",
+    left: "20%",
+    top: "30%",
+    width: "120px",
+    height: "80px",
     roomNumber: "2.6",
-    zIndex: "10",
   },
 
   {
     id: "ac21cb5b-1b79-49cd-815d-2611bc52205e",
     name: "Кабинет",
-    left: "982px",
-    top: "484px",
-    width: "31px",
-    height: "31px",
+    left: "20%",
+    top: "30%",
+    width: "120px",
+    height: "80px",
     roomNumber: "2.7",
-    zIndex: "100",
   },
   {
     id: "6c3eab38-e284-4eef-a815-79dedabdf0db",
     name: "Офис",
-    left: "982px",
-    top: "450px",
-    width: "66px",
-    height: "65px",
+    left: "20%",
+    top: "30%",
+    width: "120px",
+    height: "80px",
     roomNumber: "2.8",
   },
 
   {
     id: "4ee5487d-ad80-4384-9604-027c7c9bbe0f",
     name: "Серверная",
-    left: "951px",
-    top: "450px",
-    width: "32px",
-    height: "16px",
+    left: "20%",
+    top: "30%",
+    width: "120px",
+    height: "80px",
     roomNumber: "2.9",
   },
 
   {
     id: "646fe57b-9e35-48bd-972e-d4461c14bb9d",
     name: "Санузел",
-    left: "1002px",
-    top: "430px",
-    width: "14px",
-    height: "20px",
+    left: "20%",
+    top: "30%",
+    width: "120px",
+    height: "80px",
     roomNumber: "2.10",
   },
 
   {
     id: "65d2717c-0759-40cd-8fc2-c27b7aeeab99",
     name: "Коридор",
-    left: "1015px",
-    top: "430px",
-    width: "33px",
-    height: "20px",
-    roomNumber: "2.11",
-  },
-
-  {
-    id: "65d2717c-0759-40cd-8fc2-c27b7aeeab99",
-    name: "Коридор",
-    left: "1047px",
-    top: "430px",
-    width: "28px",
-    height: "85px",
+    left: "20%",
+    top: "30%",
+    width: "120px",
+    height: "80px",
     roomNumber: "2.11",
   },
   {
     id: "9f8a7f64-36e8-4ffa-8f76-be0d83775c38",
     name: "Пост охраны",
-    left: "1058px",
-    top: "481px",
-    width: "17px",
-    height: "7px",
+    left: "20%",
+    top: "30%",
+    width: "120px",
+    height: "80px",
     roomNumber: "2.12",
-    zIndex: "10",
   },
-
   {
     id: "420fa328-c8b6-4db2-921f-dc903d8cb27e",
     name: "Холодильная камера",
-    left: "1092px",
-    top: "355px",
-    width: "25px",
-    height: "22px",
+    left: "69%",
+    top: "50%",
+    width: "10px",
+    height: "15px",
     roomNumber: "2.13",
   },
   //1ый этаж
@@ -990,283 +950,20 @@ export const ROOMS: Room[] = [
     roomNumber: "68",
   },
 ];
-const MainPage = () => {
-  const { products, isLoading: productsLoading } = useProducts();
-  const { getCategoryColor } = useProductColors(products);
 
-  // Состояние для режима инвентаризации
-  const [isInventoryMode, setIsInventoryMode] = useState(false);
-  const {
-    getRoomStatus,
-    getRoomDetails,
-    loading: inventoryLoading,
-    selectedReport,
-  } = useInventoryReport();
-  //удалить
-  const rooms = ROOMS;
-  //раскоментить когда перенесу массив назад
-  // const [rooms] = useState<Room[]>(ROOMS);
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [inventoryModalOpen, setInventoryModalOpen] = useState(false);
-  const [roomProducts, setRoomProducts] = useState<Product[]>([]);
-  const [openProductId, setOpenProductId] = useState<string | null>(null);
-
-  // Логирование для отладки
-  useEffect(() => {
-    console.log("📊 Режим инвентаризации:", isInventoryMode);
-    console.log("📊 Выбранный отчет:", selectedReport);
-  }, [isInventoryMode, selectedReport]);
-
-  useEffect(() => {
-    console.log("🏠 ID комнат из констант:");
-    ROOMS.forEach((room) => {
-      console.log(`  ${room.name}: ${room.id} (№${room.roomNumber})`);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (selectedReport) {
-      console.log("📋 Комнаты из отчета:");
-      selectedReport.rooms?.forEach((room) => {
-        console.log(
-          `  ${room.room_name}: ${room.room_id} (№${room.room_number})`,
-        );
-      });
-    }
-  }, [selectedReport]);
-
-  // Фильтруем товары для выбранной комнаты
-  useEffect(() => {
-    if (selectedRoom && modalOpen) {
-      console.log("Фильтруем товары для комнаты:", selectedRoom.roomNumber);
-
-      const filtered = products.filter(
-        (product) => product.room_number === selectedRoom.roomNumber,
-      );
-
-      console.log("Отфильтрованные товары:", filtered);
-      setRoomProducts(filtered);
-    }
-  }, [selectedRoom, modalOpen, products]);
-
-  // Считаем общую стоимость товаров в комнате
-  const totalPrice = useMemo(() => {
-    return roomProducts.reduce((sum, product) => sum + (product.price || 0), 0);
-  }, [roomProducts]);
-
-  const handleRoomClick = (room: Room) => {
-    console.log("🖱️ Клик по комнате:", room);
-    console.log("🖱️ Режим инвентаризации:", isInventoryMode);
-
-    setSelectedRoom(room);
-
-    if (isInventoryMode) {
-      console.log("🖱️ Открываем модалку инвентаризации для комнаты:", room.id);
-      const status = getRoomStatus(room.id);
-      const details = getRoomDetails(room.id);
-      console.log("📊 Статус комнаты:", status);
-      console.log("📊 Детали комнаты:", details);
-      setInventoryModalOpen(true);
-    } else {
-      setModalOpen(true);
-    }
-
-    setOpenProductId(null);
-  };
-
-  const closeModal = () => {
-    setModalOpen(false);
-    setInventoryModalOpen(false);
-    setSelectedRoom(null);
-    setRoomProducts([]);
-    setOpenProductId(null);
-  };
-
-  const handleProductClick = (productId: string) => {
-    setOpenProductId(openProductId === productId ? null : productId);
-  };
-
-  const handleViewClick = (item: any) => {
-    console.log("Просмотр товара:", item);
-  };
-
-  // Функция для получения цвета комнаты в режиме инвентаризации
-  const getRoomColor = (roomId: string) => {
-    if (!isInventoryMode) {
-      return "rgba(76, 175, 80, 0.2)"; // Обычный цвет
-    }
-
-    const status = getRoomStatus(roomId);
-
-    if (!status) {
-      return "rgba(158, 158, 158, 0.2)"; // Серая - нет данных
-    }
-
-    switch (status.status) {
-      case "success":
-        return "rgba(76, 175, 80, 0.3)"; // Зеленый
-      case "warning":
-        return "rgba(255, 152, 0, 0.3)"; // Оранжевый
-      case "danger":
-        return "rgba(244, 67, 54, 0.3)"; // Красный
-      default:
-        return "rgba(158, 158, 158, 0.2)";
-    }
-  };
-
-  // Функция для получения цвета границы комнаты
-  const getRoomBorderColor = (roomId: string) => {
-    if (!isInventoryMode) return "#4caf50";
-
-    const status = getRoomStatus(roomId);
-    if (!status) return "#9e9e9e";
-
-    switch (status.status) {
-      case "success":
-        return "#4caf50";
-      case "warning":
-        return "#ff9800";
-      case "danger":
-        return "#f44336";
-      default:
-        return "#9e9e9e";
-    }
-  };
-
-  return (
-    <div className="main-page">
-      <HeaderMain onInventoryModeChange={setIsInventoryMode} />
-
-      <div className="zoom-container zoom-wrapper">
-        <TransformWrapper
-          initialScale={1.5}
-          minScale={1.5}
-          maxScale={5}
-          wheel={{ step: 0.2 }}
-          pinch={{ step: 5 }}
-          doubleClick={{ disabled: true }}
-          limitToBounds={true}
-          centerOnInit={true}
-          initialPositionX={0}
-          initialPositionY={0}
-          panning={{ velocityDisabled: true }}
-        >
-          <TransformComponent
-            wrapperStyle={{
-              width: "100%",
-              height: "100%",
-            }}
-          >
-            <div className="main-content">
-              <img
-                className="main-content-svg"
-                src="/1515.svg"
-                alt="План помещения"
-              />
-
-              {rooms.map((room) => {
-                const status = isInventoryMode ? getRoomStatus(room.id) : null;
-
-                return (
-                  <div
-                    key={room.id}
-                    className={`room-block ${isInventoryMode ? "inventory-mode" : ""}`}
-                    style={{
-                      left: room.left,
-                      top: room.top,
-                      width: room.width,
-                      height: room.height,
-                      backgroundColor: getRoomColor(room.id),
-                      borderColor: getRoomBorderColor(room.id),
-                      borderWidth: isInventoryMode ? "1px" : "1px",
-                    }}
-                    onClick={() => handleRoomClick(room)}
-                    data-tooltip={`${room.name} (№${room.roomNumber})`} // 👈 Добавляем data-атрибут
-                  >
-                    {/* <div className="room-name">{room.name}</div> */}
-                    {isInventoryMode && status && status.hasIssues && (
-                      <div className="room-status-badge">
-                        {status.missingCount > 0 && (
-                          <span className="status-missing">
-                            📦 {status.missingCount}
-                          </span>
-                        )}
-                        {status.wrongCount > 0 && (
-                          <span className="status-wrong">
-                            ↺ {status.wrongCount}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </TransformComponent>
-        </TransformWrapper>
-      </div>
-
-      {/* Обычная модалка с товарами */}
-      {modalOpen && selectedRoom && !isInventoryMode && (
-        <div className="modal-overlay" onClick={closeModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" onClick={closeModal}>
-              ×
-            </button>
-
-            <div className="modal-header">
-              <h2>{selectedRoom.name}</h2>
-              <p className="room-number">Комната №{selectedRoom.roomNumber}</p>
-            </div>
-
-            {productsLoading ? (
-              <div className="loading">Загрузка товаров...</div>
-            ) : (
-              <>
-                <div className="room-stats">
-                  <div className="stat-item">
-                    <span className="stat-label">Количество МЦ:</span>
-                    <span className="stat-value">{roomProducts.length}</span>
-                  </div>
-                  <div className="stat-item">
-                    <span className="stat-label">Общая стоимость:</span>
-                    <span className="stat-value price">
-                      {totalPrice.toLocaleString()} ₽
-                    </span>
-                  </div>
-                </div>
-
-                {roomProducts.length > 0 ? (
-                  <ProductList
-                    products={roomProducts}
-                    openProductId={openProductId}
-                    onProductClick={handleProductClick}
-                    onViewClick={handleViewClick}
-                    getCategoryColor={getCategoryColor}
-                  />
-                ) : (
-                  <div className="no-products">
-                    <p>В этой комнате нет товаров</p>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Модалка инвентаризации */}
-      {inventoryModalOpen && selectedRoom && isInventoryMode && (
-        <InventoryRoomModal
-          room={selectedRoom}
-          details={getRoomDetails(selectedRoom.id)}
-          status={getRoomStatus(selectedRoom.id)}
-          onClose={closeModal}
-        />
-      )}
-    </div>
-  );
+// Если нужно будет добавлять комнаты динамически
+export const addRoom = (newRoom: Room) => {
+  // Здесь можно добавить логику сохранения в localStorage или отправки на сервер
+  console.log("Добавлена новая комната:", newRoom);
+  // ROOMS.push(newRoom); // Если массив не константа
 };
 
-export default MainPage;
+// Вспомогательная функция для поиска комнаты по ID
+export const findRoomById = (id: string): Room | undefined => {
+  return ROOMS.find((room) => room.id === id);
+};
+
+// Вспомогательная функция для поиска комнаты по номеру
+export const findRoomByNumber = (number: string): Room | undefined => {
+  return ROOMS.find((room) => room.roomNumber === number);
+};

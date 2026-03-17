@@ -1,12 +1,342 @@
-.main-page {
-  border: 1px solid red;
-  height: 98vh;
+/* Main.css */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.main-content {
-  border: 1px solid blue;
+.main-page {
+  height: 100vh;
+  overflow: hidden;
 }
-.logo {
+
+/* Контейнер для зума - ограничиваем область */
+.zoom-container {
+  position: relative;
+  width: 1600px;
+  height: 700px;
+  margin-top: 7rem;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: hidden;
+  border: 2px solid blue; /* Для отладки, потом можно убрать */
+}
+
+/* Обертка TransformWrapper */
+.zoom-wrapper {
+  width: 100%;
+  height: 90%;
+}
+
+/* Контейнер для карты */
+.main-content {
+  position: relative;
+  width: 1600px;
+  height: 700px;
   border: 1px solid red;
-  height: 8rem;
+}
+
+.main-content-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  border: 1px solid red;
+}
+
+/* Блоки комнат */
+.room-block {
+  position: absolute;
+  border: 1px solid #912828;
+  /* background-color: rgba(76, 175, 80, 0.2); */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.room-block:hover {
+  background-color: rgba(76, 175, 80, 0.4);
+}
+
+.room-name {
+  color: white;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px black;
+  font-size: 14px;
+}
+
+/* Модальное окно */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  min-width: 400px;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  background: #f0f0f0;
+  border-radius: 50%;
+}
+
+/* Стили для шапки модалки */
+.modal-header {
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 24px;
+}
+
+.room-number {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Стили для статистики комнаты */
+.room-stats {
+  background: #f5f5f5;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.stat-value.price {
+  color: #4caf50;
+  font-size: 24px;
+}
+
+/* ========== АДАПТИВ ДЛЯ ПЛАНШЕТОВ ========== */
+
+/* Планшеты в альбомной ориентации (1024px и меньше) */
+@media screen and (max-width: 1024px) {
+  .zoom-container {
+    width: 95vw; /* Растягиваем на всю ширину экрана */
+    height: 60vh; /* Уменьшаем высоту */
+    margin-top: 6rem;
+  }
+
+  .main-content {
+    width: 1400px; /* Немного уменьшаем карту */
+    height: 600px;
+  }
+
+  .room-name {
+    font-size: 12px; /* Уменьшаем текст на комнатах */
+  }
+}
+
+/* Планшеты в портретной ориентации (768px - 1023px) */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+  .zoom-container {
+    width: 98vw;
+    height: 55vh;
+    margin-top: 5rem;
+  }
+
+  .main-content {
+    width: 1200px; /* Еще уменьшаем карту */
+    height: 550px;
+  }
+
+  /* Адаптив для модалки */
+  .modal-content {
+    min-width: 350px;
+    max-width: 500px;
+    max-height: 70vh;
+    padding: 16px;
+  }
+
+  .modal-header h2 {
+    font-size: 20px;
+  }
+
+  .room-stats {
+    padding: 12px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
+
+  .stat-value.price {
+    font-size: 20px;
+  }
+
+  .room-block {
+    border-width: 1.5px; /* Тоньше границы */
+  }
+
+  .room-name {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+}
+
+/* Ноутбуки с маленьким экраном (до 1366px) */
+@media screen and (min-width: 1024px) and (max-width: 1366px) {
+  .zoom-container {
+    width: 1400px; /* Чуть меньше стандартного */
+    height: 650px;
+    margin-top: 6.5rem;
+  }
+
+  .main-content {
+    width: 1400px;
+    height: 650px;
+  }
+}
+
+/* Большие планшеты (как iPad Pro) */
+@media screen and (min-width: 1024px) and (max-height: 1366px) and (orientation: portrait) {
+  .zoom-container {
+    width: 90vw;
+    height: 45vh;
+    margin-top: 5rem;
+  }
+
+  .main-content {
+    width: 1100px;
+    height: 500px;
+  }
+
+  .modal-content {
+    max-width: 90vw;
+    min-width: 300px;
+  }
+}
+
+/* ========== ДОПОЛНИТЕЛЬНЫЕ УЛУЧШЕНИЯ ========== */
+
+/* Для лучшего отображения на всех экранах */
+@media screen and (max-height: 800px) {
+  .zoom-container {
+    height: 50vh;
+    margin-top: 5rem;
+  }
+}
+
+/* Если экран слишком узкий */
+@media screen and (max-width: 1200px) {
+  .room-stats {
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .stat-item {
+    width: 100%;
+  }
+}
+
+/* Убираем границы для продакшена (раскомментировать когда будет готово) */
+/* 
+.zoom-container {
+  border: none;
+}
+
+.main-content,
+.main-content-svg {
+  border: none;
+}
+*/
+.room-block::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  margin-bottom: 8px;
+  z-index: 1000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Если хотите стрелочку */
+.room-block::before {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
+  margin-bottom: -2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 1000;
+}
+
+.room-block:hover::after,
+.room-block:hover::before {
+  opacity: 1;
 }

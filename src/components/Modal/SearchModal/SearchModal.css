@@ -9,17 +9,19 @@
   justify-content: center;
   align-items: center;
   z-index: 2000;
+  padding: 1rem;
 }
 
 .search-modal {
   position: relative;
   background: var(--bg-primary);
-  width: 50vw;
+  width: 55vw;
   height: 80vh;
   border-radius: var(--border-radius);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 .search-modal-header {
@@ -92,9 +94,11 @@
 }
 /* Правое меню */
 .search-right-menu {
-  width: 320px;
+  width: 38rem;
   padding: 24px;
   overflow-y: auto;
+  margin-left: -1rem;
+  margin-right: 2rem;
 }
 
 .search-actions {
@@ -226,4 +230,6 @@
 .search-right-menu::-webkit-scrollbar-thumb:hover,
 .search-products-list::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+@media (max-width: 1400px) {
 }

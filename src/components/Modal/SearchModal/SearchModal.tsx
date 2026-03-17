@@ -52,7 +52,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
     console.log("Просмотр товара:", product);
   };
 
-  // Обработчик генерации отчета
   const handleGenerateReport = (format: "excel" | "word") => {
     console.log("📊 Генерация отчета в модалке поиска:", format);
     console.log("Товаров для отчета:", filteredProducts.length);
@@ -78,7 +77,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
     setIsReportModalOpen(false);
   };
 
-  // Обработчик предпросмотра Word
   const handlePreviewWord = (format: "word") => {
     console.log("👁️ Предпросмотр Word в модалке поиска");
 
@@ -232,7 +230,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* Модалки отчета - теперь ВНУТРИ search-modal, но поверх контента */}
         {isReportModalOpen && (
           <div className="modal-stack">
             <ReportModal
@@ -248,7 +245,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
           </div>
         )}
 
-        {/* Модалка предпросмотра Word */}
         {isPreviewOpen && (
           <div className="modal-stack">
             <WordPreviewModal

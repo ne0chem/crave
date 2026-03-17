@@ -53,13 +53,12 @@
 }
 
 .items-count {
-  background-color: #f0f8ff;
+  background-color: var(--bg-primary);
   padding: 12px;
   border-radius: 8px;
   margin: 0 0 20px 0;
   font-size: 1rem;
-  color: #0066cc;
-  border-left: 4px solid #0066cc;
+  color: var(--text-primary);
 }
 
 .items-count strong {
@@ -68,8 +67,8 @@
 
 .format-section h3,
 .options-section h3 {
-  font-size: 1rem;
-  color: #666;
+  font-size: var(--fz--osnova);
+  color: var(--text-primary);
   margin: 0 0 12px 0;
 }
 
@@ -95,16 +94,6 @@
   display: none;
 }
 
-.format-option.selected {
-  border-color: #0066cc;
-  background-color: #f0f8ff;
-}
-
-.format-icon {
-  font-size: 2rem;
-  margin-bottom: 8px;
-}
-
 .format-name {
   font-weight: 500;
   color: #333;
@@ -120,7 +109,6 @@
 
 .preview-btn {
   padding: 8px 16px;
-  background: #17a2b8;
   color: white;
   border: none;
   border-radius: 6px;
@@ -130,10 +118,6 @@
   white-space: nowrap;
   transition: background 0.2s;
   height: fit-content;
-}
-
-.preview-btn:hover {
-  background: #138496;
 }
 
 .preview-btn:active {
@@ -165,6 +149,7 @@
   margin-bottom: 10px;
   color: #555;
   cursor: pointer;
+  font-size: var(--fz--osnova);
 }
 
 .checkbox-label input[type="checkbox"] {
@@ -188,21 +173,6 @@
   border-radius: 6px;
   cursor: pointer;
   font-size: 1rem;
-}
-
-.generate-btn {
-  padding: 10px 24px;
-  background: #0066cc;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
-.generate-btn:hover {
-  background: #0052a3;
 }
 
 .cancel-btn:hover {

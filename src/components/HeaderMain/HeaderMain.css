@@ -1,4 +1,97 @@
 .main-header {
   display: flex;
-  border: 1px solid green;
+  justify-content: space-between;
+}
+.header__button {
+  display: flex;
+  gap: 1rem;
+
+  z-index: 100;
+}
+.reuslt {
+  width: 20rem;
+  height: 4rem;
+  border-radius: var(--border-radius);
+  background: var(--hover-gray);
+  font-weight: 400;
+  transition: all 0.3s ease;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+.reuslt:hover,
+.poisk__mz:hover {
+  background-color: var(--accent-gray);
+  transform: var(--transformY);
+}
+.poisk__mz {
+  width: 10rem;
+  height: 4rem;
+  border-radius: var(--border-radius);
+  background: var(--border-color);
+  font-weight: 400;
+  transform: scale();
+  font-weight: 600;
+}
+.sections-nav {
+  display: flex;
+  gap: 1rem;
+}
+.section1,
+.section2,
+.section3 {
+  display: inline-block;
+  width: auto;
+  max-width: 40rem;
+  height: 4rem;
+  border-radius: var(--border-radius);
+  background: var(--hover-gray);
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: inherit;
+  line-height: 4rem;
+  text-align: center;
+  padding: 0 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  z-index: 100;
+}
+
+.section1:hover {
+  background: #87c7ceda; /* темнее при наведении */
+  transform: var(--transformY);
+}
+.section1 {
+  background-color: #87c7ceb9;
+}
+.section2 {
+  width: 20rem;
+  background-color: #5fbd5f70;
+}
+.section2:hover {
+  background: #5fbd5fa1; /* темнее при наведении */
+  transform: var(--transformY);
+}
+.section3 {
+  width: 20rem;
+  background-color: #e4cb507e;
+}
+.section3:hover {
+  background: #e4cb509d; /* темнее при наведении */
+  transform: var(--transformY);
+}
+.stock-btn {
+  width: 10rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  font-size: 1.3rem;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+.stock-btn:hover {
+  transform: var(--transformY);
+  background-color: var(--accent-gray);
 }

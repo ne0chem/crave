@@ -1,4 +1,4 @@
-// src/components/Modal/ReportModal.tsx
+//компонент модалки отчета обычного ( со страниц с категориями)
 import React, { useState } from "react";
 import "./ReportModal.css";
 
@@ -6,7 +6,7 @@ interface ReportModalProps {
   isOpen: boolean;
   onClose: () => void;
   onGenerate: (format: "excel" | "word") => void;
-  onPreview?: (format: "word") => void; // 👈 Пропс для предпросмотра
+  onPreview?: (format: "word") => void;
   itemCount: number;
 }
 
@@ -14,7 +14,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
   isOpen,
   onClose,
   onGenerate,
-  onPreview, // 👈 ДОБАВЛЯЕМ в пропсы
+  onPreview,
   itemCount,
 }) => {
   const [selectedFormat, setSelectedFormat] = useState<"excel" | "word">(
@@ -63,7 +63,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
                   checked={selectedFormat === "excel"}
                   onChange={(e) => setSelectedFormat(e.target.value as "excel")}
                 />
-                <span className="format-icon">📊</span>
+
                 <span className="format-name">Excel</span>
               </label>
 
@@ -80,18 +80,17 @@ const ReportModal: React.FC<ReportModalProps> = ({
                       setSelectedFormat(e.target.value as "word")
                     }
                   />
-                  <span className="format-icon">📄</span>
+
                   <span className="format-name">Word</span>
                 </label>
 
-                {/* 👈 Кнопка предпросмотра появляется только для Word */}
                 {selectedFormat === "word" && onPreview && (
                   <button
                     className="preview-btn"
                     onClick={handlePreview}
                     type="button"
                   >
-                    👁️ Предпросмотр
+                    Предпросмотр
                   </button>
                 )}
               </div>
