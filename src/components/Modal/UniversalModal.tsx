@@ -353,9 +353,7 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
 
   const renderConfirmForm = () => (
     <div className="confirm-content">
-      <p>
-        {formData.confirmMessage || "Вы уверены, что хотите списать товар?"}
-      </p>
+      <p>{formData.confirmMessage || "Вы уверены, что хотите списать МЦ?"}</p>
       <div className="button__container">
         <button className="button__modal" onClick={onConfirm}>
           Да, списать

@@ -89,7 +89,7 @@ const InventoryRoomModal: React.FC<InventoryRoomModalProps> = ({
         <div className="inventory-lists">
           {hasCorrect && (
             <div className="inventory-section correct">
-              <h3>✓ Правильные товары</h3>
+              <h3>Найденные МЦ</h3>
               <div className="items-list">
                 {details.correct.map((item) => (
                   <div key={item.id} className="inventory-item">
@@ -105,7 +105,7 @@ const InventoryRoomModal: React.FC<InventoryRoomModalProps> = ({
 
           {hasMissing && (
             <div className="inventory-section missing">
-              <h3>⚠ Отсутствуют</h3>
+              <h3>Отсутствуют</h3>
               <div className="items-list">
                 {details.missing.map((item) => (
                   <div key={item.id} className="inventory-item">
@@ -121,7 +121,7 @@ const InventoryRoomModal: React.FC<InventoryRoomModalProps> = ({
 
           {hasWrong && (
             <div className="inventory-section wrong">
-              <h3>↺ Чужие товары</h3>
+              <h3>МЦ из другой комнаты</h3>
               <div className="items-list">
                 {details.wrong.map((item) => (
                   <div key={item.id} className="inventory-item">

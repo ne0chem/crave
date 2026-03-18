@@ -1,6 +1,7 @@
 .main-header {
   display: flex;
   justify-content: space-between;
+  margin-top: 1rem;
 }
 .header__button {
   display: flex;
@@ -61,27 +62,24 @@
 }
 
 .section1:hover {
-  background: #87c7ceda; /* темнее при наведении */
-  transform: var(--transformY);
+  background: #c8b4f033; /* темнее при наведении */
 }
 .section1 {
-  background-color: #87c7ceb9;
+  background-color: #b9a1e76c;
 }
 .section2 {
   width: 20rem;
-  background-color: #5fbd5f70;
+  background-color: #8ee2e252;
 }
 .section2:hover {
-  background: #5fbd5fa1; /* темнее при наведении */
-  transform: var(--transformY);
+  background: #a0dcdc33; /* темнее при наведении */
 }
 .section3 {
   width: 20rem;
-  background-color: #e4cb507e;
+  background-color: #a1e2ae60;
 }
 .section3:hover {
-  background: #e4cb509d; /* темнее при наведении */
-  transform: var(--transformY);
+  background: #aadcb433; /* темнее при наведении */
 }
 .stock-btn {
   width: 10rem;
