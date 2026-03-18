@@ -19,7 +19,7 @@ const CATEGORY_COLORS = [
 ];
 
 // Цвета секций (только для активных товаров)
-const SECTION_COLORS = ["#916ed3", "#53dddd", "#6ac07b"];
+const SECTION_COLORS = ["#916ed3", "#53dddd", "#5dc071"];
 
 // Добавим цвет для списанных товаров (если нужно)
 const WRITTEN_OFF_COLOR = "#dc3545"; // красный для списанных
