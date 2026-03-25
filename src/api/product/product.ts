@@ -1,138 +1,177 @@
 import { apiClient } from "../client";
 import {
-  Product,
-  ProductFilters,
   CreateProductData,
   UpdateProductData,
   WriteoffData,
+  ProductFilters,
 } from "../../types/product.types";
 
 console.log("📁 Products API модуль загружен");
 
 export const productsApi = {
-  // ============= ТОВАРЫ =============
-
-  // Получение списка товаров
   getProducts: async (filters?: ProductFilters) => {
-    console.log("📦 Запрос списка товаров");
+    console.log("📦 Запрос списка активных товаров с фильтрами:", filters);
 
     try {
-      const response = await apiClient.get("/inventory_tools_type", {
+      const response = await apiClient.get("/inventory_tools/list", {
         params: filters,
       });
-
-      console.log("✅ Товары получены:", response.data);
+      console.log("✅ Активные товары получены:", response.data);
       return response.data;
     } catch (error: any) {
-      console.error("❌ Ошибка:", error);
+      console.error("❌ Ошибка получения товаров:", error);
       throw error;
     }
   },
 
-  // Создание товара
   createProduct: async (productData: CreateProductData) => {
     console.log("➕ Создание товара:", productData);
 
     try {
-      const response = await apiClient.post(
-        "/inventory_tools_type",
-        productData,
-      );
+      const payload = {
+        name: productData.name,
+        inventory_tools_type: productData.inventory_tools_type,
+        description: productData.description || null,
+        price: productData.price,
+        inv_number: productData.inv_number,
+        room_id: productData.roomInfo?.id,
+        building: productData.building,
+        floor_number: productData.floor_number,
+        section: productData.section,
+        rfid: productData.rfid || null,
+        attributes: productData.attributes || null,
+      };
+
+      const response = await apiClient.post("/inventory_tool", payload);
       console.log("✅ Товар создан:", response.data);
       return response.data;
     } catch (error: any) {
-      console.error("❌ Ошибка:", error);
+      console.error("❌ Ошибка создания товара:", error);
       throw error;
     }
   },
 
-  // Обновление товара
   updateProduct: async ({ id, ...data }: UpdateProductData) => {
     console.log(`✏️ Обновление товара ${id}:`, data);
 
     try {
-      const response = await apiClient.put(`/inventory_tools_type/${id}`, data);
+      const payload = {
+        name: data.name,
+        inventory_tools_type: data.inventory_tools_type,
+        description: data.description,
+        price: data.price,
+        inv_number: data.inv_number,
+        room_id: data.room_id,
+        building: data.building,
+        floor_number: data.floor_number,
+        section: data.section,
+      };
+
+      console.log("📤 Отправляем payload:", payload);
+
+      const response = await apiClient.put(`/inventory_tool/${id}`, payload);
       console.log(`✅ Товар обновлен:`, response.data);
       return response.data;
     } catch (error: any) {
-      console.error(`❌ Ошибка:`, error);
+      console.error(`❌ Ошибка обновления товара:`, error);
       throw error;
     }
   },
 
-  // ============= СПИСАНИЕ =============
-
-  // Списание товара (отдельный запрос)
-  // 1. Функция списания товара
   writeoffProduct: async (data: WriteoffData) => {
     console.log(`📝 Списание товара ${data.productId}:`, data);
 
     try {
-      // Ищем товар в inventory_tools_type
-      const productResponse = await apiClient.get(
-        `/inventory_tools_type/${data.productId}`,
+      const response = await apiClient.delete(
+        `/inventory_tools/${data.productId}`,
+        {
+          data: {
+            description: data.reason,
+            written_off_by: data.person,
+          },
+        },
       );
-      const product = productResponse.data;
 
-      // Создаем запись о списании
-      const writeoffData = {
-        ...product,
-        written_off_by: data.person,
-        reason: data.reason,
-        deleted_at: data.date || new Date().toISOString(),
-        // Убираем roomInfo при списании
-        roomInfo: undefined,
+      console.log(`✅ Товар ID ${data.productId} списан`);
+
+      return {
+        success: true,
+        productId: data.productId,
+        message: "Товар успешно списан",
       };
-
-      // Отправляем в written_off_inventory
-      const response = await apiClient.post(
-        `/written_off_inventory`,
-        writeoffData,
-      );
-
-      // Удаляем из активного инвентаря (опционально)
-      // await apiClient.del(`/inventory_tools_type/${data.productId}`);
-
-      console.log(`✅ Товар списан:`, response.data);
-      return response.data;
     } catch (error: any) {
-      console.error(`❌ Ошибка списания:`, error);
+      console.error(`❌ Ошибка списания товара ${data.productId}:`, error);
       throw error;
     }
   },
 
-  // 2. Получение списанных товаров
-  getWrittenOffProducts: async (filters?: any) => {
-    console.log("📦 Запрос списанных товаров");
+  getWrittenOffProducts: async (
+    building?: string,
+    filters?: ProductFilters,
+  ) => {
+    console.log(`📦 Запрос списанных товаров для здания: ${building}`, filters);
 
     try {
-      const response = await apiClient.get("/written_off_inventory", {
-        params: filters,
-      });
+      let url = "/inventory_tools/removed";
+      const params: any = { ...filters };
 
-      // Если данные приходят как массив в массиве, распрямляем
-      let data = response.data;
-      if (Array.isArray(data) && data.length === 1 && Array.isArray(data[0])) {
-        data = data[0]; // Берем внутренний массив
+      if (building) {
+        params.building = building;
       }
 
-      console.log("✅ Списанные товары получены:", data);
-      return data;
+      const response = await apiClient.get(url, {
+        params: params,
+      });
+
+      let data = response.data;
+
+      console.log("📦 Ответ от API списанных товаров:", data);
+
+      if (data && data.inventory_tools && Array.isArray(data.inventory_tools)) {
+        data = data.inventory_tools;
+        console.log("🔄 Извлечен массив inventory_tools, размер:", data.length);
+      } else if (
+        Array.isArray(data) &&
+        data.length === 1 &&
+        Array.isArray(data[0])
+      ) {
+        data = data[0];
+      } else if (!Array.isArray(data)) {
+        console.warn("⚠️ Неожиданный формат данных:", data);
+        data = [];
+      }
+
+      console.log(
+        `✅ Списанные товары для ${building || "всех зданий"} получены:`,
+        data?.length || 0,
+        "шт.",
+      );
+      return data || [];
     } catch (error: any) {
-      console.error("❌ Ошибка:", error);
+      console.error("❌ Ошибка получения списанных товаров:", error);
       throw error;
     }
   },
 
-  // Универсальный метод для создания/обновления
-  saveProduct: async (data: CreateProductData | UpdateProductData) => {
-    // Если есть id - это обновление, если нет - создание
-    if ("id" in data && data.id) {
-      console.log(`✏️ Сохранение (обновление) товара ${data.id}:`, data);
-      return await productsApi.updateProduct(data as UpdateProductData);
-    } else {
-      console.log("➕ Сохранение (создание) товара:", data);
-      return await productsApi.createProduct(data as CreateProductData);
+  getAllWrittenOffProducts: async (filters?: ProductFilters) => {
+    console.log("📦 Запрос списанных товаров для всех зданий");
+
+    try {
+      const buildings = ["theatre", "warehouse1", "warehouse2"];
+      const results = await Promise.all(
+        buildings.map((building) =>
+          productsApi.getWrittenOffProducts(building, filters),
+        ),
+      );
+
+      const allProducts = results.flat();
+      console.log(
+        `✅ Все списанные товары получены: ${allProducts.length} шт.`,
+      );
+      return allProducts;
+    } catch (error: any) {
+      console.error("❌ Ошибка получения всех списанных товаров:", error);
+      throw error;
     }
   },
 };

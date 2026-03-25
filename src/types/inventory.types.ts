@@ -1,81 +1,55 @@
-// types/inventory.types.ts
-
-export interface InventoryItem {
-  id: string;
-  name: string;
-  inventory_tools_type: string;
-  description: string;
-  inv_number: string;
-  price: number;
-  rfid: string | null;
-}
-
-export interface CorrectItem extends InventoryItem {}
-
-export interface MissingItem extends InventoryItem {
-  expected_room: string;
-  current_location: string;
-}
-
-export interface WrongRoomItem extends InventoryItem {
-  room_name: string;
-  room_number: string;
-  found_in_room: string;
-  expectedRoom?: string;
-  foundRoom?: string;
+export interface InventoryReport {
+  report_id: string;
+  date: string;
+  rooms: InventoryRoom[];
 }
 
 export interface InventoryRoom {
   room_id: string;
   room_number: string;
   room_name: string;
+  room_section?: string;
   section?: string;
-  "correct-item": CorrectItem[];
-  "missing-item": MissingItem[];
-  "wrong-room-item": WrongRoomItem[];
+  "correct-item"?: InventoryItem[];
+  "missing-item"?: InventoryItem[];
+  "wrong-room-item"?: InventoryItem[];
 }
 
-// 👇 НОВЫЙ ТИП: для вложенного отчета в wrong-room-item
-export interface NestedInventoryReport {
-  report_id: string;
-  date: string;
-  rooms: InventoryRoom[];
-  "wrong-room-item"?: any[]; // может быть пустым массивом
-}
-
-// 👇 ОБНОВЛЕННЫЙ ТИП: InventoryReport
-export interface InventoryReport {
-  report_id: string;
-  date: string;
-  rooms: InventoryRoom[];
-  "wrong-room-item": NestedInventoryReport[]; // теперь это массив отчетов!
+export interface InventoryItem {
+  id: string;
+  name: string;
+  inventory_tools_type: string;
+  description?: string;
+  inv_number: string;
+  price: number;
+  rfid?: string;
+  created_at: string;
+  updated_at?: string;
+  room_name?: string;
+  room_number?: string;
+  expected_room?: string;
+  current_location?: string;
   section?: string;
 }
 
-// Дополнительные типы
 export interface InventoryFilters {
-  startDate?: string;
-  endDate?: string;
+  reportId?: string;
   roomId?: string;
-  status?: "all" | "correct" | "missing" | "wrong";
+  status?: "correct" | "missing" | "wrong";
+  dateFrom?: string;
+  dateTo?: string;
+  section?: string;
+  search?: string;
 }
 
 export interface InventoryActionData {
   itemId: string;
   item: InventoryItem;
-  action: "confirm" | "missing" | "move";
   roomInfo?: any;
   targetRoom?: string;
+  action: "confirm" | "missing" | "move";
   timestamp: string;
-  notes?: string;
 }
-
-export type InventoryModalType =
-  | "inventory_report_view"
-  | "inventory_item_details"
-  | "inventory_correct"
-  | "inventory_missing"
-  | "inventory_wrong_room";
 
 export interface ReportStats {
   totalCorrect: number;
@@ -87,25 +61,21 @@ export interface ReportStats {
 }
 
 export interface RoomInventoryStatus {
-  roomId: string;
-  roomNumber: string;
-  roomName: string;
-  status: "success" | "warning" | "danger" | "pending";
+  status: "success" | "warning" | "danger";
   correctCount: number;
   missingCount: number;
   wrongCount: number;
-  totalItems: number;
   correctPrice: number;
   missingPrice: number;
   wrongPrice: number;
   totalPrice: number;
-  hasIssues: boolean;
   hasMissing: boolean;
   hasWrong: boolean;
+  hasIssues?: boolean;
 }
 
 export interface RoomInventoryDetails {
-  correct: CorrectItem[];
-  missing: MissingItem[];
-  wrong: WrongRoomItem[];
+  correct: InventoryItem[];
+  missing: InventoryItem[];
+  wrong: InventoryItem[];
 }

@@ -19,7 +19,6 @@ export default function Auth() {
       ...prev,
       [name]: value,
     }));
-    // Очищаем ошибку при вводе
     setLocalError("");
   };
 
@@ -27,25 +26,36 @@ export default function Auth() {
     e.preventDefault();
     setLocalError("");
 
-    // Валидация
     if (!formData.login.trim() || !formData.password.trim()) {
       setLocalError("Заполните все поля");
       return;
     }
 
     try {
-      // Отправляем запрос на вход
+      console.log("📤 Отправка данных для входа:", {
+        login: formData.login,
+        password: "***",
+      });
+
       await login({
         login: formData.login,
-        // или login: formData.login, если бэкенд ожидает login
         password: formData.password,
       });
 
-      // Если успешно - редирект на главную
-      navigate("/main");
+      console.log("✅ Вход выполнен успешно");
+
+      const token = localStorage.getItem("token");
+      const user = localStorage.getItem("user");
+      console.log("🔑 Токен после входа:", token ? "есть" : "нет");
+      console.log(
+        "👤 Пользователь после входа:",
+        user ? JSON.parse(user) : "нет",
+      );
+
+      navigate("/main", { replace: true });
+      console.log("🔄 Редирект на /main выполнен");
     } catch (err) {
-      // Ошибка уже обрабатывается в контексте
-      console.error("Ошибка входа:", err);
+      console.error("❌ Ошибка входа в handleSubmit:", err);
     }
   };
 

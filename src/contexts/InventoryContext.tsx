@@ -1,5 +1,3 @@
-// context/InventoryContext.tsx
-
 import React, { createContext, useContext, useState, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { inventoryApi } from "../api/inventory/inventory.api";
@@ -11,7 +9,6 @@ import {
 } from "../types/inventory.types";
 
 interface InventoryContextType {
-  // Состояние
   reports: InventoryReport[] | undefined;
   currentReport: InventoryReport | null;
   selectedItem: InventoryItem | null;
@@ -19,18 +16,15 @@ interface InventoryContextType {
   error: Error | null;
   filters: InventoryFilters;
 
-  // Действия с отчетами
   setCurrentReport: (report: InventoryReport | null) => void;
   setFilters: (filters: InventoryFilters) => void;
   refreshReports: () => void;
 
-  // Действия с товарами
   setSelectedItem: (item: InventoryItem | null) => void;
   confirmItem: (item: InventoryItem, roomInfo?: any) => Promise<void>;
   reportMissing: (item: InventoryItem, roomInfo?: any) => Promise<void>;
   moveItem: (item: InventoryItem, targetRoom: string) => Promise<void>;
 
-  // Экспорт
   exportCurrentReport: (format?: "pdf" | "excel") => Promise<void>;
 }
 
@@ -38,7 +32,6 @@ const InventoryContext = createContext<InventoryContextType | undefined>(
   undefined,
 );
 
-// Ключи для React Query
 const INVENTORY_REPORTS_KEY = "inventory-reports";
 
 export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -51,9 +44,6 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [filters, setFilters] = useState<InventoryFilters>({});
 
-  // ============= QUERIES =============
-
-  // Получение всех отчетов
   const {
     data: reports,
     isLoading,
@@ -62,22 +52,17 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({
   } = useQuery({
     queryKey: [INVENTORY_REPORTS_KEY, filters],
     queryFn: () => inventoryApi.getReports(filters),
-    staleTime: 5 * 60 * 1000, // 5 минут
+    staleTime: 5 * 60 * 1000,
   });
 
-  // ============= MUTATIONS =============
-
-  // Подтверждение товара
   const confirmMutation = useMutation({
     mutationFn: (data: InventoryActionData) =>
       inventoryApi.confirmCorrectItem(data),
     onSuccess: () => {
-      // Инвалидируем кэш, чтобы обновить данные
       queryClient.invalidateQueries({ queryKey: [INVENTORY_REPORTS_KEY] });
     },
   });
 
-  // Оформление пропажи
   const missingMutation = useMutation({
     mutationFn: (data: InventoryActionData) =>
       inventoryApi.reportMissingItem(data),
@@ -86,7 +71,6 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({
     },
   });
 
-  // Перемещение товара
   const moveMutation = useMutation({
     mutationFn: (data: InventoryActionData) =>
       inventoryApi.moveItemToCorrectRoom(data),
@@ -94,8 +78,6 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({
       queryClient.invalidateQueries({ queryKey: [INVENTORY_REPORTS_KEY] });
     },
   });
-
-  // ============= ACTIONS =============
 
   const confirmItem = useCallback(
     async (item: InventoryItem, roomInfo?: any) => {
@@ -168,7 +150,6 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-// Хук для использования контекста
 export const useInventory = () => {
   const context = useContext(InventoryContext);
   if (context === undefined) {

@@ -3,7 +3,6 @@ export enum ModalType {
   ITEM_EDIT = "itemEdit",
   ITEM_ADD = "itemAdd",
   ACTION = "action",
-  CONFIRM = "confirm",
 }
 
 export interface ModalConfig {
@@ -12,18 +11,15 @@ export interface ModalConfig {
 
 export type ModalConfigMap = Record<ModalType, ModalConfig>;
 
-// 👇 Обновленный интерфейс комнаты в соответствии с данными из бэка
 export interface Room {
-  id: string; // uuid
-  name: string; // "Кабинет"
-  number: string; // "44/1"
-  building: string; // "theatre"
-  floor: number; // 1
-  floor_number?: number; // опционально, если есть
-  // можно добавить другие поля по необходимости
+  id: string;
+  name: string;
+  number: string;
+  building: string;
+  floor: number;
+  floor_number?: number;
 }
 
-// 👇 Вспомогательная функция для получения полного названия комнаты
 export const getRoomFullName = (room: Room): string => {
   return `${room.name} ${room.number} (${room.building}, ${room.floor} этаж)`;
 };

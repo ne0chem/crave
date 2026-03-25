@@ -1,5 +1,3 @@
-// src/components/ReportItem.tsx
-
 import React from "react";
 import { InventoryReport } from "../../types/inventory.types";
 
@@ -47,6 +45,8 @@ const ReportItem: React.FC<ReportItemProps> = ({
     }).format(price);
   };
 
+  const hasSections = sections && sections.length > 0;
+
   return (
     <div
       className={`report-item ${isSelected ? "selected" : ""}`}
@@ -60,24 +60,22 @@ const ReportItem: React.FC<ReportItemProps> = ({
         <span className="stat total">
           Всего: {stats.totalCorrect + stats.totalMissing + stats.totalWrong}
         </span>
-        <span className="stat correct">Найденные МЦ {stats.totalCorrect}</span>
-        <span className="stat missing">
-          Отсутсвующие МЦ {stats.totalMissing}
-        </span>
-        <span className="stat wrong">МЦ не на месте {stats.totalWrong}</span>
+        <span className="stat correct">Найдено: {stats.totalCorrect}</span>
+        <span className="stat missing">Отсутствует: {stats.totalMissing}</span>
+        <span className="stat wrong">Не на месте: {stats.totalWrong}</span>
       </div>
 
       <div className="report-details">
         <div className="detail-item">
           <span className="detail-label">Помещение:</span>
           <span className="detail-value" title={roomsList}>
-            {roomsList}
+            {roomsList || "Все помещения"}
           </span>
         </div>
 
-        {sections.length > 0 && (
+        {hasSections && (
           <div className="detail-item">
-            <span className="detail-label">Секция:</span>
+            <span className="detail-label">Секции:</span>
             <div className="sections-list">
               {sections.map((section) => (
                 <span key={section} className="section-tag">
@@ -87,6 +85,27 @@ const ReportItem: React.FC<ReportItemProps> = ({
             </div>
           </div>
         )}
+
+        {/* Если нет секций, но есть formatted строка, показываем её */}
+        {!hasSections && sectionsFormatted && (
+          <div className="detail-item">
+            <span className="detail-label">Секции:</span>
+            <span className="detail-value" title={sectionsFormatted}>
+              {sectionsFormatted}
+            </span>
+          </div>
+        )}
+
+        <div className="detail-item">
+          <span className="detail-label">Общая стоимость:</span>
+          <span className="detail-value price">
+            {formatPrice(
+              stats.totalCorrectPrice +
+                stats.totalMissingPrice +
+                stats.totalWrongPrice,
+            )}
+          </span>
+        </div>
       </div>
     </div>
   );

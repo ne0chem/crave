@@ -1,31 +1,26 @@
-/* логика отображение цветов */
 import { useMemo } from "react";
 import { InventoryItem, isDisposal, Product } from "../types/product.types";
 
-// Пастельные цвета для категорий товаров
 const CATEGORY_COLORS = [
-  "#E6D5B8", // песочный
-  "#D4E2D4", // мятно-зеленый
-  "#E8D0B3", // кремовый
-  "#D5C7E8", // лавандовый
-  "#F5D7D7", // бледно-розовый
-  "#C4D7E0", // голубовато-серый
-  "#E2CFC4", // телесный
-  "#D1E0D7", // светлый шалфей
-  "#E8D3D0", // пудрово-розовый
-  "#D9D0C9", // серо-бежевый
-  "#D6E0E8", // светлый блюз
-  "#E0D3D0", // розовато-серый
+  "#E6D5B8",
+  "#D4E2D4",
+  "#E8D0B3",
+  "#D5C7E8",
+  "#F5D7D7",
+  "#C4D7E0",
+  "#E2CFC4",
+  "#D1E0D7",
+  "#E8D3D0",
+  "#D9D0C9",
+  "#D6E0E8",
+  "#E0D3D0",
 ];
 
-// Цвета секций (только для активных товаров)
-const SECTION_COLORS = ["#916ed3", "#53dddd", "#5dc071"];
+const SECTION_COLORS = ["#916ed3", "#53dddd", "#a2c05d", "#5dc071"];
 
-// Добавим цвет для списанных товаров (если нужно)
-const WRITTEN_OFF_COLOR = "#dc3545"; // красный для списанных
+const WRITTEN_OFF_COLOR = "#dc3545";
 
 export const useProductColors = (items: InventoryItem[]) => {
-  // Мемоизируем уникальные категории из всех товаров
   const uniqueCategories = useMemo(
     () =>
       items
@@ -36,7 +31,6 @@ export const useProductColors = (items: InventoryItem[]) => {
     [items],
   );
 
-  // Создаем Map для соответствия категория -> цвет
   const categoryColorMap = useMemo(() => {
     const map = new Map();
     uniqueCategories.forEach((category, index) => {
@@ -45,30 +39,25 @@ export const useProductColors = (items: InventoryItem[]) => {
     return map;
   }, [uniqueCategories]);
 
-  // Функция получения цвета категории (работает для всех товаров)
   const getCategoryColor = (category: string): string => {
     return categoryColorMap.get(category) || "#ccc";
   };
 
-  // Функция получения цвета для товара с учетом статуса
   const getItemColor = (item: InventoryItem): string => {
-    // Если товар списан - возвращаем красный цвет
     if (isDisposal(item)) {
       return WRITTEN_OFF_COLOR;
     }
-    // Если активный - цвет по категории
+
     return getCategoryColor(item.inventory_tools_type);
   };
 
-  // Функция получения цвета секции по индексу (только для активных товаров)
   const getSectionColor = (index: number): string => {
     return SECTION_COLORS[index % SECTION_COLORS.length];
   };
 
-  // Для каждой секции получаем ее цвет (только из активных товаров)
   const sectionColorsMap = useMemo(() => {
     const map = new Map();
-    // Берем только активные товары для секций
+
     const activeProducts = items.filter(
       (item): item is Product => !isDisposal(item),
     );
@@ -85,17 +74,14 @@ export const useProductColors = (items: InventoryItem[]) => {
     return map;
   }, [items]);
 
-  // Функция получения цвета секции по названию (только для активных товаров)
   const getSectionColorByName = (section: string): string => {
     return sectionColorsMap.get(section) || "#ccc";
   };
 
-  // Функция получения цвета для отображения в левом меню
   const getLeftMenuColor = (section: string, index: number): string => {
     return getSectionColor(index);
   };
 
-  // Статистика по категориям (для всех товаров)
   const categoryStats = useMemo(() => {
     const stats = new Map();
     items.forEach((item) => {
@@ -113,15 +99,15 @@ export const useProductColors = (items: InventoryItem[]) => {
     getCategoryColor,
     getSectionColor,
     getSectionColorByName,
-    getItemColor, // 👈 НОВОЕ: цвет с учетом статуса
-    getLeftMenuColor, // 👈 НОВОЕ: для левого меню
+    getItemColor,
+    getLeftMenuColor,
     uniqueCategories,
     categoryColorMap,
     sectionColorsMap,
-    categoryStats, // 👈 НОВОЕ: статистика по категориям
-    // Если нужны сами массивы цветов
+    categoryStats,
+
     categoryColors: CATEGORY_COLORS,
     sectionColors: SECTION_COLORS,
-    writtenOffColor: WRITTEN_OFF_COLOR, // 👈 НОВОЕ
+    writtenOffColor: WRITTEN_OFF_COLOR,
   };
 };

@@ -1,6 +1,4 @@
-// components/InventoryRoomModal/InventoryRoomModal.tsx
 import React from "react";
-import { Room } from "../../../constants/rooms";
 import {
   RoomInventoryDetails,
   RoomInventoryStatus,
@@ -8,7 +6,7 @@ import {
 import "./InventoryRoomModal.css";
 
 interface InventoryRoomModalProps {
-  room: Room;
+  room: any;
   details: RoomInventoryDetails | null;
   status: RoomInventoryStatus | null;
   onClose: () => void;
@@ -20,6 +18,9 @@ const InventoryRoomModal: React.FC<InventoryRoomModalProps> = ({
   status,
   onClose,
 }) => {
+  const roomNumber = room.roomNumber || room.number || room.room_number || "?";
+  const roomName = room.name || room.room_name || "Комната";
+
   if (!details || !status) {
     return (
       <div className="modal-overlay" onClick={onClose}>
@@ -27,8 +28,8 @@ const InventoryRoomModal: React.FC<InventoryRoomModalProps> = ({
           <button className="modal-close" onClick={onClose}>
             ×
           </button>
-          <h2>{room.name}</h2>
-          <p className="room-number">Комната №{room.roomNumber}</p>
+          <h2>{roomName}</h2>
+          <p className="room-number">Комната №{roomNumber}</p>
           <div className="no-data">Нет данных инвентаризации</div>
         </div>
       </div>
@@ -50,11 +51,10 @@ const InventoryRoomModal: React.FC<InventoryRoomModalProps> = ({
         </button>
 
         <div className="modal-header">
-          <h2>{room.name}</h2>
-          <p className="room-number">Комната №{room.roomNumber}</p>
+          <h2>{roomName}</h2>
+          <p className="room-number">Комната №{roomNumber}</p>
         </div>
 
-        {/* Статистика */}
         <div className="inventory-stats">
           <div
             className={`stat-card success ${status.status === "success" ? "active" : ""}`}
@@ -85,13 +85,12 @@ const InventoryRoomModal: React.FC<InventoryRoomModalProps> = ({
           </div>
         </div>
 
-        {/* Списки товаров */}
         <div className="inventory-lists">
           {hasCorrect && (
             <div className="inventory-section correct">
               <h3>Найденные МЦ</h3>
               <div className="items-list">
-                {details.correct.map((item) => (
+                {details.correct.map((item: any) => (
                   <div key={item.id} className="inventory-item">
                     <span className="item-name">{item.name}</span>
                     <span className="item-price">
@@ -107,7 +106,7 @@ const InventoryRoomModal: React.FC<InventoryRoomModalProps> = ({
             <div className="inventory-section missing">
               <h3>Отсутствуют</h3>
               <div className="items-list">
-                {details.missing.map((item) => (
+                {details.missing.map((item: any) => (
                   <div key={item.id} className="inventory-item">
                     <span className="item-name">{item.name}</span>
                     <span className="item-price">
@@ -123,11 +122,11 @@ const InventoryRoomModal: React.FC<InventoryRoomModalProps> = ({
             <div className="inventory-section wrong">
               <h3>МЦ из другой комнаты</h3>
               <div className="items-list">
-                {details.wrong.map((item) => (
+                {details.wrong.map((item: any) => (
                   <div key={item.id} className="inventory-item">
                     <span className="item-name">{item.name}</span>
                     <span className="item-location">
-                      Из комнаты {item.expectedRoom || item.room_number}
+                      Из комнаты {item.expectedRoom}
                     </span>
                     <span className="item-price">
                       {item.price.toLocaleString()} ₽
@@ -139,7 +138,6 @@ const InventoryRoomModal: React.FC<InventoryRoomModalProps> = ({
           )}
         </div>
 
-        {/* Итог */}
         <div className="inventory-total">
           <div className="total-label">Общая стоимость:</div>
           <div className="total-value">

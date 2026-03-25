@@ -1,3 +1,14 @@
+.logo__svg {
+  position: absolute;
+}
+.logo {
+  position: relative;
+  width: 80rem;
+  top: -20%;
+  left: 70%;
+  margin-top: -20rem;
+  z-index: 1;
+}
 .main-header {
   display: flex;
   justify-content: space-between;
@@ -5,6 +16,7 @@
 }
 .header__button {
   display: flex;
+  flex-direction: column;
   gap: 1rem;
 
   z-index: 100;
@@ -39,7 +51,9 @@
 }
 .section1,
 .section2,
-.section3 {
+.section3,
+.section4,
+.poisk__mz {
   display: inline-block;
   width: auto;
   max-width: 40rem;
@@ -60,9 +74,37 @@
   cursor: pointer;
   z-index: 100;
 }
-
+.poisk__mz {
+  position: absolute;
+  bottom: 15%;
+  left: 0%;
+  width: 20rem !important;
+  height: 4rem;
+}
+.sklad__bitton {
+  position: absolute;
+  bottom: 10%;
+  left: 0%;
+  width: 20rem !important;
+  height: 4rem;
+  border-radius: var(--border-radius);
+  background: var(--hover-gray);
+  font-size: 1.3rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: inherit;
+  line-height: 4rem;
+  text-align: center;
+  padding: 0 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  z-index: 100;
+}
 .section1:hover {
-  background: #c8b4f033; /* темнее при наведении */
+  background: #c8b4f09a; /* темнее при наведении */
 }
 .section1 {
   background-color: #b9a1e76c;
@@ -72,14 +114,21 @@
   background-color: #8ee2e252;
 }
 .section2:hover {
-  background: #a0dcdc33; /* темнее при наведении */
+  background: #a0dcdca9; /* темнее при наведении */
 }
 .section3 {
   width: 20rem;
   background-color: #a1e2ae60;
 }
 .section3:hover {
-  background: #aadcb433; /* темнее при наведении */
+  background: #aadcb4a4; /* темнее при наведении */
+}
+.section4 {
+  width: 20rem;
+  background-color: #d4e2a160;
+}
+.section4:hover {
+  background: #d4e2a1b7; /* темнее при наведении */
 }
 .stock-btn {
   width: 10rem;

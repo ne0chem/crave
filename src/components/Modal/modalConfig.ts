@@ -15,7 +15,4 @@ export const modalConfig: ModalConfigMap = {
   [ModalType.ACTION]: {
     title: "Списание МЦ",
   },
-  [ModalType.CONFIRM]: {
-    title: "Подтверждение",
-  },
 };

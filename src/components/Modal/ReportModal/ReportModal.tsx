@@ -1,4 +1,3 @@
-//компонент модалки отчета обычного ( со страниц с категориями)
 import React, { useState } from "react";
 import "./ReportModal.css";
 

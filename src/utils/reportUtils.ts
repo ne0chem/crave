@@ -1,13 +1,9 @@
-// src/utils/reportUtils.ts
-
 import {
   InventoryReport,
   InventoryRoom,
-  WrongRoomItem,
-  ReportStats,
+  InventoryItem,
 } from "../types/inventory.types";
 
-// Форматирование цены
 export const formatPrice = (price: number): string => {
   return new Intl.NumberFormat("ru-RU", {
     style: "currency",
@@ -16,13 +12,11 @@ export const formatPrice = (price: number): string => {
   }).format(price);
 };
 
-// Подсчет общей стоимости
 export const calculateTotalPrice = (items: any[] = []): number => {
   return items.reduce((sum, item) => sum + (item.price || 0), 0);
 };
 
-// Получение статистики по отчету
-export const getReportStats = (report: InventoryReport): ReportStats => {
+export const getReportStats = (report: InventoryReport) => {
   let totalCorrect = 0,
     totalMissing = 0,
     totalWrong = 0;
@@ -40,9 +34,6 @@ export const getReportStats = (report: InventoryReport): ReportStats => {
     totalWrongPrice += calculateTotalPrice(room["wrong-room-item"] || []);
   });
 
-  totalWrong += report["wrong-room-item"]?.length || 0;
-  totalWrongPrice += calculateTotalPrice(report["wrong-room-item"] || []);
-
   return {
     totalCorrect,
     totalMissing,
@@ -53,14 +44,15 @@ export const getReportStats = (report: InventoryReport): ReportStats => {
   };
 };
 
-// Получение уникальных секций - ИСПРАВЛЕНО: явно указываем возвращаемый тип string[]
 export const getUniqueSections = (report: InventoryReport): string[] => {
   if (!report.rooms || !Array.isArray(report.rooms)) {
     return [];
   }
 
   const sections = report.rooms
-    .map((room: InventoryRoom) => room.section)
+    .map((room: InventoryRoom) => {
+      return (room as any).room_section || room.section;
+    })
     .filter(
       (s: string | undefined): s is string =>
         typeof s === "string" && s.trim() !== "",
@@ -69,7 +61,6 @@ export const getUniqueSections = (report: InventoryReport): string[] => {
   return [...new Set(sections)];
 };
 
-// Форматирование списка комнат
 export const formatRoomsList = (report: InventoryReport): string => {
   if (!report.rooms?.length) return "Нет комнат";
 
@@ -87,14 +78,14 @@ export const formatRoomsList = (report: InventoryReport): string => {
   return rooms.join(", ");
 };
 
-// Форматирование секций со статистикой
 export const formatSectionsWithStats = (report: InventoryReport): string => {
   if (!report.rooms?.length) return "Секции не указаны";
 
   const sections = report.rooms.reduce(
     (acc: Record<string, number>, room: InventoryRoom) => {
-      if (room.section) {
-        acc[room.section] = (acc[room.section] || 0) + 1;
+      const section = (room as any).room_section || room.section;
+      if (section) {
+        acc[section] = (acc[section] || 0) + 1;
       }
       return acc;
     },
@@ -113,7 +104,6 @@ export const formatSectionsWithStats = (report: InventoryReport): string => {
   return sectionsList.join(", ");
 };
 
-// Форматирование даты
 export const formatDate = (dateString: string): string => {
   return new Date(dateString).toLocaleString("ru-RU", {
     day: "2-digit",

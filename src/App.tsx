@@ -1,41 +1,37 @@
-// App.tsx
 import { Routes, Route, Navigate } from "react-router-dom";
-// import { useAuth } from "./contexts/AuthContext";
-import { useAuth } from "./contexts/DummyAuthContext";
+import { useAuth, AuthProvider } from "./contexts/AuthContext";
 import Auth from "./pages/Auth/Auth";
 import MainPage from "./pages/Main/Main";
-import CatalogLayout from "./pages/Catalog/CatalogLayout"; // ← исправил путь
+import CatalogLayout from "./pages/Catalog/CatalogLayout";
 import "./App.css";
 
-// const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-//   const { token, isLoading } = useAuth();
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { token, isLoading } = useAuth();
 
-//   if (isLoading) {
-//     return <div className="loading-page">Загрузка...</div>;
-//   }
+  if (isLoading) {
+    return <div className="loading-page">Загрузка...</div>;
+  }
 
-//   if (!token) {
-//     return <Navigate to="/login" replace />;
-//   }
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
 
-//   return <>{children}</>;
-// };
+  return <>{children}</>;
+};
 
-function App() {
+function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Auth />} />
 
-      {/* Все маршруты каталога обернуты в ProtectedRoute и CatalogLayout */}
       <Route
         element={
-          // <ProtectedRoute>
-          <CatalogLayout />
-          // </ProtectedRoute>
+          <ProtectedRoute>
+            <CatalogLayout />
+          </ProtectedRoute>
         }
       >
-        <Route path="/catalog" element={<div>Категория 1</div>} />{" "}
-        {/* основной каталог */}
+        <Route path="/catalog" element={<div>Категория 1</div>} />
         <Route path="/catalog/category1" element={<div>Категория 1</div>} />
         <Route path="/catalog/category2" element={<div>Категория 2</div>} />
         <Route path="/catalog/category3" element={<div>Категория 3</div>} />
@@ -44,14 +40,24 @@ function App() {
       <Route
         path="/main"
         element={
-          // <ProtectedRoute>
-          <MainPage />
-          // </ProtectedRoute>
+          <ProtectedRoute>
+            <MainPage />
+          </ProtectedRoute>
         }
       />
 
       <Route path="/" element={<Navigate to="/main" replace />} />
     </Routes>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      {" "}
+      {/* ← ОБЯЗАТЕЛЬНО оборачиваем в AuthProvider */}
+      <AppRoutes />
+    </AuthProvider>
   );
 }
 

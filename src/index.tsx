@@ -2,10 +2,11 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter } from "react-router-dom";
-// import { AuthProvider } from "./contexts/AuthContext";
+
 import { DummyAuthProvider } from "./contexts/DummyAuthContext";
 import { ProductsProvider } from "./contexts/ProductsContext";
-import { InventoryProvider } from "./contexts/InventoryContext"; // 👈 Добавляем импорт
+import { InventoryProvider } from "./contexts/InventoryContext";
+import { RoomsProvider } from "./contexts/RoomsContext";
 import App from "./App";
 import "./index.css";
 
@@ -25,9 +26,10 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <DummyAuthProvider>
           <ProductsProvider>
             <InventoryProvider>
-              {" "}
+              <RoomsProvider>
+                <App />
+              </RoomsProvider>{" "}
               {/* 👈 Добавляем провайдер инвентаризации */}
-              <App />
             </InventoryProvider>
           </ProductsProvider>
         </DummyAuthProvider>

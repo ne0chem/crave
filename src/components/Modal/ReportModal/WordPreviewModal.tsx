@@ -1,4 +1,3 @@
-//ппредварительный показ модалки с отчетом по товарам из страницы категорий
 import React, { useEffect, useRef, useState } from "react";
 import "./WordPreviewModal.css";
 
@@ -24,7 +23,6 @@ const WordPreviewModal: React.FC<WordPreviewModalProps> = ({
       setIsLoading(true);
 
       try {
-        // Используем iframe для правильного отображения стилей
         if (iframeRef.current) {
           const iframe = iframeRef.current;
           const iframeDoc =

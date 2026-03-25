@@ -1,6 +1,4 @@
-// types/filters.types.ts (или прямо в файле Filtres.tsx)
 interface FiltersProps {
-  // Состояния
   sortType: string | null;
   priceFrom: number | "";
   priceTo: number | "";
@@ -13,7 +11,6 @@ interface FiltersProps {
   };
   searchSection: string;
 
-  // Функции для обновления
   setSortType: (value: string | null) => void;
   setPriceFrom: (value: number | "") => void;
   setPriceTo: (value: number | "") => void;
@@ -23,14 +20,11 @@ interface FiltersProps {
   setSearchSection: (value: string) => void;
   setOpenFilter: (value: string | null) => void;
 
-  // Данные для отображения
   uniqueCategories: string[];
   uniqueSections: string[];
   uniqueRooms: string[];
 
-  // Состояние открытого фильтра
   openFilter: string | null;
 
-  // Функция сброса
   resetFilters: () => void;
 }

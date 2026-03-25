@@ -1,4 +1,3 @@
-// ProductList.tsx
 import {
   InventoryItem,
   isDisposal,
@@ -8,7 +7,7 @@ import {
 import "./ProductList.css";
 
 interface ProductListProps {
-  products: InventoryItem[]; // 👈 Может быть и Product и Disposal
+  products: InventoryItem[];
   openProductId: string | null;
   onProductClick: (productId: string) => void;
   onEditClick?: (product: Product) => void;
@@ -17,6 +16,7 @@ interface ProductListProps {
   onRestoreClick?: (disposal: Disposal) => void;
   getCategoryColor: (category: string) => string;
   showWrittenOff?: boolean;
+  rooms?: any[];
 }
 
 export default function ProductList({
@@ -24,22 +24,61 @@ export default function ProductList({
   openProductId,
   onProductClick,
   onEditClick,
-  onViewClick,
   onWriteoffClick,
   onRestoreClick,
   getCategoryColor,
   showWrittenOff = false,
+  rooms = [],
 }: ProductListProps) {
-  // Форматирование даты
   const formatDate = (dateString?: string) => {
     if (!dateString) return "Нет";
     return new Date(dateString).toLocaleDateString("ru-RU");
   };
 
+  const getRoomNameById = (roomId?: string): string => {
+    if (!roomId) {
+      console.log("⚠️ Нет room_id для товара");
+      return "Не указано";
+    }
+
+    console.log(`🔍 Ищем комнату с ID: ${roomId}`);
+
+    const room = rooms.find((r) => {
+      return (
+        r.id === roomId ||
+        r.room_id === roomId ||
+        r.id?.toString() === roomId?.toString()
+      );
+    });
+
+    if (room) {
+      console.log(`✅ Найдена комната: ${room.name} (№${room.number})`);
+      return `${room.name} (№${room.number})`;
+    }
+
+    console.log(
+      `❌ Комната с ID ${roomId} не найдена среди ${rooms.length} комнат`,
+    );
+    console.log(
+      "📋 Доступные ID комнат:",
+      rooms.map((r) => ({ id: r.id, name: r.name })),
+    );
+    return "Не указано";
+  };
+
+  const getRoomFloor = (roomId?: string): string => {
+    if (!roomId) return "?";
+    const room = rooms.find((r) => r.id === roomId || r.room_id === roomId);
+    if (room) {
+      const floor = room.floor || room.floor_number || room.floor;
+      return String(floor);
+    }
+    return "?";
+  };
+
   return (
     <div className="products-list">
       {products.map((item: InventoryItem) => {
-        // 👈 ПРОВЕРЯЕМ ТИП!
         const isDisposalItem = isDisposal(item);
 
         return (
@@ -84,8 +123,15 @@ export default function ProductList({
                     <>
                       <p>
                         <strong>Помещение:</strong>{" "}
-                        {(item as Product).room_name || "Не указано"}, этаж{" "}
-                        {(item as Product).floor_number || "?"}
+                        {getRoomNameById((item as Product).room_id) ||
+                          (item as Product).room_name ||
+                          "Не указано"}
+                      </p>
+                      <p>
+                        <strong>Этаж:</strong>{" "}
+                        {getRoomFloor((item as Product).room_id) ||
+                          (item as Product).floor_number ||
+                          "?"}
                       </p>
                       <p>
                         <strong>Секция:</strong>{" "}
@@ -97,10 +143,6 @@ export default function ProductList({
                   {/* Для списанных товаров (Disposal) */}
                   {isDisposalItem && (
                     <>
-                      <p className="written-off-location">
-                        <strong>Последнее местоположение:</strong>{" "}
-                        {(item as Disposal).room_name || "Не указано"}
-                      </p>
                       <p className="written-off-field">
                         <strong>Дата списания:</strong>{" "}
                         {formatDate((item as Disposal).deleted_at)}
@@ -164,7 +206,7 @@ export default function ProductList({
                       <div className="action-item">
                         <p className="action-text">Списать МЦ</p>
                         <button
-                          className="action-button writeoff-button"
+                          className="action-button edit-button"
                           onClick={(e) => {
                             e.stopPropagation();
                             onWriteoffClick(item as Product);
@@ -179,6 +221,27 @@ export default function ProductList({
                         </button>
                       </div>
                     </>
+                  )}
+
+                  {/* Для списанных товаров - можно добавить кнопку восстановления */}
+                  {isDisposalItem && onRestoreClick && (
+                    <div className="action-item">
+                      <p className="action-text">Восстановить МЦ</p>
+                      <button
+                        className="action-button restore-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onRestoreClick(item as Disposal);
+                        }}
+                        title="Восстановить"
+                      >
+                        <img
+                          className="action-icon"
+                          src="/restore.svg"
+                          alt="Восстановить"
+                        />
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

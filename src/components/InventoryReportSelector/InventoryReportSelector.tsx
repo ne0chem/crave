@@ -1,5 +1,3 @@
-// src/components/InventoryReportSelector.tsx
-
 import React, { useState } from "react";
 import { useInventory } from "../../contexts/InventoryContext";
 import Modal from "../Modal/Modal";
@@ -14,7 +12,7 @@ import {
 } from "../../utils/reportUtils";
 import { generateReportHtml } from "../../utils/wordGenerator";
 import { generateExcel } from "../../utils/excelGenerator";
-import { InventoryReport, ReportStats } from "../../types/inventory.types"; // 👈 ИМПОРТИРУЕМ ТИПЫ
+import { InventoryReport, ReportStats } from "../../types/inventory.types";
 import "./InventoryReportSelector.css";
 
 interface InventoryReportSelectorProps {
@@ -91,12 +89,11 @@ const InventoryReportSelector: React.FC<InventoryReportSelectorProps> = ({
             <>
               <div className="reports-list">
                 {reports?.map((report: InventoryReport) => {
-                  // 👈 ЯВНО УКАЗЫВАЕМ ТИП
-                  const stats: ReportStats = getReportStats(report); // 👈 ЯВНО УКАЗЫВАЕМ ТИП
-                  const sections: string[] = getUniqueSections(report); // 👈 ЯВНО УКАЗЫВАЕМ ТИП
-                  const roomsList: string = formatRoomsList(report); // 👈 ЯВНО УКАЗЫВАЕМ ТИП
+                  const stats: ReportStats = getReportStats(report);
+                  const sections: string[] = getUniqueSections(report);
+                  const roomsList: string = formatRoomsList(report);
                   const sectionsFormatted: string =
-                    formatSectionsWithStats(report); // 👈 ЯВНО УКАЗЫВАЕМ ТИП
+                    formatSectionsWithStats(report);
                   const isSelected = selectedReport === report.report_id;
 
                   return (

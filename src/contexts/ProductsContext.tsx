@@ -1,23 +1,28 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 import { productsApi } from "../api/product/product";
 import {
   Product,
-  Disposal, // 👈 ИМПОРТИРУЕМ Disposal
+  Disposal,
   ProductFilters,
   CreateProductData,
   UpdateProductData,
   WriteoffData,
-  InventoryItem, // 👈 Для объединенного типа
 } from "../types/product.types";
 import { useAuth } from "./DummyAuthContext";
 import { useEffect } from "react";
+import { transformFloorsToProducts } from "../utils/transformProducts";
 
 console.log("📁 ProductsContext модуль загружен");
 
 interface ProductsContextType {
-  // Состояние
-  products: Product[]; // Только активные
-  writtenOffProducts: Disposal[]; // 👈 ИСПРАВЛЕНО: теперь Disposal[], а не Product[]
+  products: Product[];
+  writtenOffProducts: Disposal[];
   selectedProduct: Product | null;
   totalProducts: number;
   currentPage: number;
@@ -25,14 +30,18 @@ interface ProductsContextType {
   isLoading: boolean;
   error: string | null;
   filters: ProductFilters;
+  selectedBuilding: string;
 
-  // Методы для работы с товарами
   fetchProducts: (filters?: ProductFilters) => Promise<void>;
-  fetchWrittenOffProducts: (filters?: ProductFilters) => Promise<void>;
+  fetchWrittenOffProducts: (
+    building?: string,
+    filters?: ProductFilters,
+  ) => Promise<void>;
   createProduct: (data: CreateProductData) => Promise<Product>;
   updateProduct: (data: UpdateProductData) => Promise<Product>;
-  writeoffProduct: (data: WriteoffData) => Promise<Disposal>; // 👈 ИСПРАВЛЕНО: возвращает Disposal
+  writeoffProduct: (data: WriteoffData) => Promise<any>;
   setFilters: (filters: ProductFilters) => void;
+  setSelectedBuilding: (building: string) => void;
   clearSelectedProduct: () => void;
   clearError: () => void;
 }
@@ -49,9 +58,8 @@ export const ProductsProvider = ({
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
 
-  // Состояние
   const [products, setProducts] = useState<Product[]>([]);
-  const [writtenOffProducts, setWrittenOffProducts] = useState<Disposal[]>([]); // 👈 ИСПРАВЛЕНО
+  const [writtenOffProducts, setWrittenOffProducts] = useState<Disposal[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [totalProducts, setTotalProducts] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -59,6 +67,9 @@ export const ProductsProvider = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<ProductFilters>({});
+  const [selectedBuilding, setSelectedBuilding] = useState<string>("theatre");
+
+  const isMounted = useRef(true);
 
   console.log("📊 ProductsContext состояние:", {
     productsCount: products.length,
@@ -68,30 +79,40 @@ export const ProductsProvider = ({
     currentPage,
     totalPages,
     isAdmin,
+    selectedBuilding,
   });
 
-  // Получение списка активных товаров
   const fetchProducts = useCallback(
     async (newFilters?: ProductFilters) => {
-      const currentFilters = {
-        ...(newFilters || filters),
-      };
+      const currentFilters = newFilters || filters;
 
       setIsLoading(true);
       setError(null);
 
       try {
-        const productsData = await productsApi.getProducts(currentFilters);
+        const response = await productsApi.getProducts(currentFilters);
 
-        // 👇 ФИЛЬТРУЕМ: оставляем только без deleted_at
-        const activeProducts = productsData.filter((p: any) => !p.deleted_at);
+        let activeProducts: Product[] = [];
+
+        if (response && response.floors) {
+          console.log("🔄 Трансформируем данные из формата floors");
+          activeProducts = transformFloorsToProducts(response.floors);
+        } else if (Array.isArray(response)) {
+          activeProducts = response;
+        } else {
+          activeProducts = [];
+        }
+
+        activeProducts = activeProducts.filter((p: any) => !p.deleted_at);
 
         console.log("✅ Активные товары загружены:", activeProducts.length);
         setProducts(activeProducts);
+        setTotalProducts(activeProducts.length);
       } catch (error: any) {
         console.error("❌ Ошибка загрузки товаров:", error);
         setError(error.message || "Ошибка загрузки товаров");
         setProducts([]);
+        setTotalProducts(0);
       } finally {
         setIsLoading(false);
       }
@@ -99,29 +120,53 @@ export const ProductsProvider = ({
     [filters],
   );
 
-  // Получение списанных товаров
   const fetchWrittenOffProducts = useCallback(
-    async (newFilters?: ProductFilters) => {
-      const currentFilters = {
-        ...(newFilters || filters),
-      };
+    async (building?: string, newFilters?: ProductFilters) => {
+      const currentFilters = newFilters || filters;
+      const currentBuilding = building || selectedBuilding;
+
+      console.log(`📦 Запрос списанных товаров для здания: ${currentBuilding}`);
 
       setIsLoading(true);
       setError(null);
 
       try {
-        const disposalsData =
-          await productsApi.getWrittenOffProducts(currentFilters);
+        const response = await productsApi.getWrittenOffProducts(
+          currentBuilding,
+          currentFilters,
+        );
 
-        // 👇 Преобразуем в Disposal[] и фильтруем
-        const disposals: Disposal[] = disposalsData
-          .map((item: any) => ({
-            ...item,
-            deleted_at: item.deleted_at || new Date().toISOString(), // гарантируем поле
-          }))
-          .filter((d: any) => d.deleted_at); // только с deleted_at
+        let disposals: Disposal[] = [];
 
-        console.log("✅ Списанные товары загружены:", disposals.length);
+        if (Array.isArray(response)) {
+          disposals = response.map((item: any) => ({
+            id: item.id,
+            name: item.name,
+            inventory_tools_type: item.inventory_tools_type,
+            description: item.description,
+            inv_number: item.inv_number,
+            price: item.price,
+            floor_number: item.floor_number,
+            rfid: item.rfid,
+            attributes: item.attributes,
+            created_at: item.created_at,
+            updated_at: item.updated_at,
+            room_id: item.room_id,
+            room_number: item.room_number,
+            room_name: item.room_name,
+            building: item.building,
+            section: item.section,
+            deleted_at:
+              item.deleted_at || item.removed_at || new Date().toISOString(),
+            written_off_by: item.written_off_by,
+            reason: item.reason,
+          }));
+        }
+
+        console.log(
+          `✅ Списанные товары для ${currentBuilding} загружены:`,
+          disposals.length,
+        );
         setWrittenOffProducts(disposals);
       } catch (error: any) {
         console.error("❌ Ошибка загрузки списанных товаров:", error);
@@ -131,10 +176,9 @@ export const ProductsProvider = ({
         setIsLoading(false);
       }
     },
-    [filters],
+    [filters, selectedBuilding],
   );
 
-  // Первоначальная загрузка
   useEffect(() => {
     console.log("🔄 ProductsProvider: загружаем товары");
     Promise.all([fetchProducts(), fetchWrittenOffProducts()]).catch((error) => {
@@ -142,7 +186,15 @@ export const ProductsProvider = ({
     });
   }, []);
 
-  // Создание товара (только для админов)
+  useEffect(() => {
+    if (selectedBuilding && isMounted.current) {
+      console.log(
+        `🔄 Здание изменено на: ${selectedBuilding}, обновляем списанные товары`,
+      );
+      fetchWrittenOffProducts(selectedBuilding);
+    }
+  }, [selectedBuilding, fetchWrittenOffProducts]);
+
   const createProduct = useCallback(
     async (data: CreateProductData) => {
       console.log("➕ createProduct вызван с данными:", data);
@@ -159,12 +211,8 @@ export const ProductsProvider = ({
 
       try {
         const newProduct = await productsApi.createProduct(data);
-
         console.log("✅ Товар создан:", newProduct);
-
-        // Обновляем список активных товаров
         await fetchProducts();
-
         return newProduct;
       } catch (error: any) {
         console.error("❌ Ошибка создания товара:", error);
@@ -177,7 +225,6 @@ export const ProductsProvider = ({
     [isAdmin, fetchProducts],
   );
 
-  // Обновление товара (только для админов)
   const updateProduct = useCallback(
     async (data: UpdateProductData) => {
       console.log(`✏️ updateProduct вызван для ID ${data.id}:`, data);
@@ -194,14 +241,11 @@ export const ProductsProvider = ({
 
       try {
         const updatedProduct = await productsApi.updateProduct(data);
-
         console.log(`✅ Товар ID ${data.id} обновлен:`, updatedProduct);
 
-        // Обновляем списки
         await fetchProducts();
         await fetchWrittenOffProducts();
 
-        // Если это выбранный товар - обновляем его
         if (selectedProduct?.id === data.id) {
           setSelectedProduct(updatedProduct);
         }
@@ -218,7 +262,6 @@ export const ProductsProvider = ({
     [isAdmin, fetchProducts, fetchWrittenOffProducts, selectedProduct],
   );
 
-  // Списание товара
   const writeoffProduct = useCallback(
     async (data: WriteoffData) => {
       console.log(`📝 writeoffProduct вызван для ID ${data.productId}:`, data);
@@ -234,14 +277,12 @@ export const ProductsProvider = ({
       setError(null);
 
       try {
-        const disposal = await productsApi.writeoffProduct(data);
+        const result = await productsApi.writeoffProduct(data);
+        console.log(`✅ Товар ID ${data.productId} списан`);
 
-        console.log(`✅ Товар ID ${data.productId} списан:`, disposal);
-
-        // Обновляем оба списка
         await Promise.all([fetchProducts(), fetchWrittenOffProducts()]);
 
-        return disposal;
+        return result;
       } catch (error: any) {
         console.error(`❌ Ошибка списания товара ID ${data.productId}:`, error);
         setError(error.message || "Ошибка списания товара");
@@ -253,12 +294,10 @@ export const ProductsProvider = ({
     [isAdmin, fetchProducts, fetchWrittenOffProducts],
   );
 
-  // Очистка выбранного товара
   const clearSelectedProduct = useCallback(() => {
     setSelectedProduct(null);
   }, []);
 
-  // Очистка ошибки
   const clearError = useCallback(() => {
     setError(null);
   }, []);
@@ -266,7 +305,6 @@ export const ProductsProvider = ({
   return (
     <ProductsContext.Provider
       value={{
-        // Состояние
         products,
         writtenOffProducts,
         selectedProduct,
@@ -276,14 +314,15 @@ export const ProductsProvider = ({
         isLoading,
         error,
         filters,
+        selectedBuilding,
 
-        // Методы
         fetchProducts,
         fetchWrittenOffProducts,
         createProduct,
         updateProduct,
         writeoffProduct,
         setFilters,
+        setSelectedBuilding,
         clearSelectedProduct,
         clearError,
       }}

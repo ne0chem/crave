@@ -1,22 +1,23 @@
-// types/auth.types.ts
 export interface LoginCredentials {
   login: string;
   password: string;
 }
 
+export interface User {
+  id: string;
+  login: string;
+  role: string;
+  name?: string;
+}
+
 export interface LoginResponse {
   token: string;
-  user: {
-    // убираем '?'
-    id: string;
-    name: string;
-    login: string;
-    role?: string; // role может и не быть, это ок
-  };
+  access_token?: string;
+  user?: User;
 }
 
 export interface AuthState {
-  user: LoginResponse["user"] | null; // теперь работает!
+  user: User | null;
   token: string | null;
   isLoading: boolean;
   error: string | null;

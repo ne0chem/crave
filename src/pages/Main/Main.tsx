@@ -1,14 +1,14 @@
 import "./Main.css";
 import HeaderMain from "../../components/HeaderMain/HeaderMain";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import ProductList from "../../components/ProductList/ProductList";
 import InventoryRoomModal from "../../components/Modal/InventoryRoomModal/InventoryRoomModal";
 import { useProducts } from "../../contexts/ProductsContext";
 import { useProductColors } from "../../hooks/useProductColors";
 import { useInventoryReport } from "../../hooks/useInventoryReport";
 import { Product } from "../../types/product.types";
-// import { ROOMS, Room } from "../../constants/rooms";
+import { ROOMS_THEATER, ROOMS_WAREHOUSE } from "../../constants/rooms";
 
 interface Room {
   id: string;
@@ -26,1258 +26,68 @@ interface Room {
   section?: string;
 }
 
-// 👇 МАССИВ ПРЯМО В КОМПОНЕНТЕ
-export const ROOMS: Room[] = [
-  //склад
-  // {
-  //   id: "cd2fa866-7bbb-4eb2-b95d-2b674165e20f",
-  //   name: "Помещение склада 1",
-  //   left: "20%",
-  //   top: "30%",
-  //   width: "120px",
-  //   height: "80px",
-  //   roomNumber: "1",
-  // },
-  // {
-  //   id: "445f979b-5581-444b-9a84-072473c1f2aa",
-  //   name: "Помещение склада 2",
-  //   left: "20%",
-  //   top: "30%",
-  //   width: "120px",
-  //   height: "80px",
-  //   roomNumber: "1",
-  // },
-  //добавить 3 склад
-  // {
-  //   id: "a0e6c9cd-31ba-44c1-bb88-9630a2b5c182",
-  //   name: "Репетиционный зал",
-  //   left: "20%",
-  //   top: "30%",
-  //   width: "120px",
-  //   height: "80px",
-  //   roomNumber: "2.3",
-  // },
-  //2 этаж (готов)
-
-  {
-    id: "0e62d7df-f095-408d-aa39-971ae04f726f",
-    name: "Коридор",
-    left: "1047px",
-    top: "355px",
-    width: "13px",
-    height: "75px",
-    roomNumber: "2.1",
-    section: "Служебная",
-  },
-
-  {
-    id: "0e62d7df-f095-408d-aa39-971ae04f726f",
-    name: "Коридор",
-    left: "951px",
-    top: "430px",
-    width: "52px",
-    height: "20px",
-    roomNumber: "2.1",
-    section: "Служебная",
-  },
-
-  {
-    id: "353fe49d-008a-47cc-8a12-33cebca6b2d2",
-    name: "Кухня",
-    left: "1059px",
-    top: "355px",
-    width: "34px",
-    height: "56px",
-    roomNumber: "2.2",
-    section: "Служебная",
-  },
-
-  {
-    id: "a0e6c9cd-31ba-44c1-bb88-9630a2b5c182",
-    name: "Репетиционный зал",
-    left: "951px",
-    top: "355px",
-    width: "97px",
-    height: "75px",
-    roomNumber: "2.3",
-    section: "Служебная",
-  },
-  {
-    id: "5b428404-d194-4794-97ae-7b2b34738c9b",
-    name: "Костюмерная",
-    left: "1059px",
-    top: "410px",
-    width: "34px",
-    height: "20px",
-    roomNumber: "2.4",
-    section: "Служебная",
-  },
-
-  {
-    id: "885bbc53-0bb0-477d-8dcb-0db76ac994fa",
-    name: "Санузел",
-    left: "951px",
-    top: "465px",
-    width: "32px",
-    height: "50px",
-    roomNumber: "2.5",
-    section: "Гостевая",
-  },
-  {
-    id: "4e0e176d-bd70-4c39-985e-29ba96ea0483",
-    name: "Кабинет",
-    left: "1058px",
-    top: "469px",
-    width: "17px",
-    height: "13px",
-    roomNumber: "2.6",
-    zIndex: "10",
-    section: "Гостевая",
-  },
-
-  {
-    id: "ac21cb5b-1b79-49cd-815d-2611bc52205e",
-    name: "Кабинет",
-    left: "982px",
-    top: "484px",
-    width: "31px",
-    height: "31px",
-    roomNumber: "2.7",
-    zIndex: "100",
-    section: "Гостевая",
-  },
-  {
-    id: "6c3eab38-e284-4eef-a815-79dedabdf0db",
-    name: "Офис",
-    left: "982px",
-    top: "450px",
-    width: "66px",
-    height: "65px",
-    roomNumber: "2.8",
-    section: "Гостевая",
-  },
-
-  {
-    id: "4ee5487d-ad80-4384-9604-027c7c9bbe0f",
-    name: "Серверная",
-    left: "951px",
-    top: "450px",
-    width: "32px",
-    height: "16px",
-    roomNumber: "2.9",
-    section: "Сценографическая",
-  },
-
-  {
-    id: "646fe57b-9e35-48bd-972e-d4461c14bb9d",
-    name: "Санузел",
-    left: "1002px",
-    top: "430px",
-    width: "14px",
-    height: "20px",
-    roomNumber: "2.10",
-    section: "Сценографическая",
-  },
-
-  {
-    id: "65d2717c-0759-40cd-8fc2-c27b7aeeab99",
-    name: "Коридор",
-    left: "1015px",
-    top: "430px",
-    width: "33px",
-    height: "20px",
-    roomNumber: "2.11",
-    section: "Сценографическая",
-  },
-
-  {
-    id: "65d2717c-0759-40cd-8fc2-c27b7aeeab99",
-    name: "Коридор",
-    left: "1047px",
-    top: "430px",
-    width: "28px",
-    height: "85px",
-    roomNumber: "2.11",
-    section: "Сценографическая",
-  },
-  {
-    id: "9f8a7f64-36e8-4ffa-8f76-be0d83775c38",
-    name: "Пост охраны",
-    left: "1058px",
-    top: "481px",
-    width: "17px",
-    height: "7px",
-    roomNumber: "2.12",
-    zIndex: "10",
-    section: "Сценографическая",
-  },
-
-  {
-    id: "420fa328-c8b6-4db2-921f-dc903d8cb27e",
-    name: "Холодильная камера",
-    left: "1092px",
-    top: "355px",
-    width: "25px",
-    height: "22px",
-    roomNumber: "2.13",
-    section: "Сценографическая",
-  },
-  //1ый этаж
-  {
-    id: "40729af7-db5a-42ee-86d7-b2657840b54b",
-    name: "Тамбур",
-    left: "465px",
-    top: "447px",
-    width: "35px",
-    height: "50px",
-    roomNumber: "1",
-    transform: "rotate(12deg)",
-    section: "Служебная",
-  },
-  {
-    id: "23e52001-739b-43cf-a65d-1531d1bc40ed",
-    name: "Вестибюль",
-    left: "498px",
-    top: "462px",
-    width: "105px",
-    height: "50px",
-    roomNumber: "2",
-    transform: "rotate(12deg)",
-    section: "Служебная",
-  },
-
-  {
-    id: "c29c6e3e-ad38-4f8f-98ec-3871fd5f54e2",
-    name: "Вестибюль",
-    left: "595px",
-    top: "470px",
-    width: "86px",
-    height: "53px",
-    roomNumber: "2/1",
-    section: "Служебная",
-  },
-
-  {
-    id: "a14a3668-cbcc-4da5-b5d6-08bc6e2942bb",
-    name: "Фойе",
-    left: "680px",
-    top: "456px",
-    width: "96px",
-    height: "67px",
-    roomNumber: "3",
-    section: "Служебная",
-  },
-
-  {
-    id: "87096702-778f-410b-b004-d336d8233091",
-    name: "Зона бара",
-    left: "775px",
-    top: "456px",
-    width: "18px",
-    height: "67px",
-    roomNumber: "4",
-    section: "Служебная",
-  },
-
-  {
-    id: "680b27cc-f348-410e-90a5-71f517e3976d",
-    name: "Зона технологии бара",
-    left: "792px",
-    top: "471px",
-    width: "35px",
-    height: "35px",
-    roomNumber: "5",
-    section: "Служебная",
-  },
-
-  {
-    id: "46b7589f-e077-4b50-80ab-6195db447ed2",
-    name: "Коридор",
-    left: "792px",
-    top: "506px",
-    width: "45px",
-    height: "17px",
-    roomNumber: "6",
-    section: "Служебная",
-  },
-
-  {
-    id: "46b7589f-e077-4b50-80ab-6195db447ed2",
-    name: "Коридор",
-    left: "826px",
-    top: "232px",
-    width: "11px",
-    height: "275px",
-    roomNumber: "6",
-    section: "Служебная",
-  },
-
-  {
-    id: "9de448f3-58cc-425d-8921-44dae0cf1ab1",
-    name: "Комната светорежиссера и видео инженера",
-    left: "792px",
-    top: "433px",
-    width: "26px",
-    height: "39px",
-    roomNumber: "7",
-    section: "Служебная",
-    clipPath: "polygon(0 10px, 20px 0, 100% 0, 100% 100%, 0 100%)",
-  },
-
-  {
-    id: "48b012df-ee8d-4b33-8795-060df917b294",
-    name: "Комната звукорежиссера",
-    left: "698px",
-    top: "436px",
-    width: "23px",
-    height: "21px",
-    roomNumber: "7/1",
-    section: "Служебная",
-  },
-
-  {
-    id: "725d6818-02a6-4b7b-9723-4f1c5dbbe350",
-    name: "Кладовая",
-    left: "809px",
-    top: "388px",
-    width: "18px",
-    height: "46px",
-    roomNumber: "8",
-    section: "Служебная",
-  },
-
-  {
-    id: "2a96c968-0198-4de5-94b4-261168f80902",
-    name: "Кладовая",
-    left: "817px",
-    top: "433px",
-    width: "10px",
-    height: "39px",
-    roomNumber: "9",
-    section: "Служебная",
-  },
-
-  {
-    id: "f14273c1-5d7c-4b00-ac0c-86367474bbbe",
-    name: "Лестница",
-    left: "809px",
-    top: "340px",
-    width: "18px",
-    height: "49px",
-    roomNumber: "10",
-    section: "Служебная",
-  },
-
-  {
-    id: "c7849b8a-e322-4b36-bd11-3d6842412014",
-    name: "Левый карман сцены",
-    left: "698px",
-    top: "258px",
-    width: "23px",
-    height: "61px",
-    roomNumber: "11",
-    section: "Служебная",
-  },
-
-  {
-    id: "2850c9ca-799a-4718-81fa-60d278fc9456",
-    name: "Правый карман сцены",
-    left: "790px",
-    top: "258px",
-    width: "37px",
-    height: "61px",
-    roomNumber: "11/1",
-    section: "Служебная",
-  },
-  {
-    id: "2850c9ca-799a-4718-81fa-60d278fc9456",
-    name: "Кладовая",
-    left: "809px",
-    top: "318px",
-    width: "18px",
-    height: "23px",
-    roomNumber: "11/2",
-    section: "Служебная",
-  },
-
-  {
-    id: "33e1ff17-4d6a-4fa5-8f0b-edd6931e4059",
-    name: "Кладовая",
-    left: "720px",
-    top: "258px",
-    width: "71px",
-    height: "61px",
-    roomNumber: "12",
-    section: "Служебная",
-  },
-
-  {
-    id: "2b4ae6fc-afb3-4538-a1ec-3d4550bbb61a",
-    name: "Сцена",
-    left: "720px",
-    top: "318px",
-    width: "73px",
-    height: "119px",
-    roomNumber: "12/1",
-    section: "Служебная",
-  },
-
-  {
-    id: "a04c0c8e-02fe-4af0-9fec-ca2456aa9d9d",
-    name: "Правый бенуар",
-    left: "792px",
-    top: "318px",
-    width: "18px",
-    height: "126px",
-    roomNumber: "14",
-    section: "Служебная",
-    clipPath: " polygon(0px 0, 100% 0%, 100% 90%, 0% 100%, 0% 40px)",
-  },
-
-  {
-    id: "f126d7fb-1221-4567-a274-1cdb4de40716",
-    name: "Правая ложа",
-    left: "801px",
-    top: "389px",
-    width: "18px",
-    height: "23px",
-    borderRadius: "50%",
-    roomNumber: "14/1",
-    zIndex: "10",
-    section: "Служебная",
-  },
-
-  {
-    id: "3ee8b5c7-a9b5-42cb-b6ef-17438cf10573",
-    name: "Левый бенуар",
-    left: "698px",
-    top: "318px",
-    width: "23px",
-    height: "119px",
-    roomNumber: "15",
-    section: "Служебная",
-  },
-
-  {
-    id: "9d0ab99f-767b-4cb4-b4dd-50f3f5a49f4d",
-    name: "Левая ложа",
-    left: "690px",
-    top: "383px",
-    width: "18px",
-    height: "32px",
-    roomNumber: "15/1",
-    borderRadius: "0 100% 10% 0",
-    zIndex: "10",
-    section: "Служебная",
-  },
-
-  {
-    id: "9779bdfc-3587-43fe-bd90-c9d202af6fae",
-    name: "Партер зала",
-    left: "720px",
-    top: "436px",
-    width: "73px",
-    height: "22px",
-    roomNumber: "16",
-    section: "Служебная",
-  },
-
-  {
-    id: "55d34ce5-8dd9-410f-ba15-eea08116ae37",
-    name: "Кабинет",
-    left: "644px",
-    top: "443px",
-    width: "16px",
-    height: "18px",
-    roomNumber: "17",
-    section: "Служебная",
-  },
-  {
-    id: "bd4fafa1-2e87-45ad-acf0-eef39d46ad12",
-    name: "Тамбур",
-    left: "644px",
-    top: "460px",
-    width: "37px",
-    height: "11px",
-    roomNumber: "17/1",
-    section: "Служебная",
-  },
-  {
-    id: "9eb7867f-b51c-4559-886a-99606a6f73b3",
-    name: "Кабинет",
-    left: "659px",
-    top: "443px",
-    width: "22px",
-    height: "18px",
-    roomNumber: "18",
-    section: "Служебная",
-  },
-  {
-    id: "a374a236-6e33-4b0e-90b5-44c79b0c675f",
-    name: "Комната охраны",
-    left: "644px",
-    top: "419px",
-    width: "36px",
-    height: "25px",
-    roomNumber: "19",
-    section: "Служебная",
-  },
-  {
-    id: "082e483d-4023-44cc-9c81-821e6ca41338",
-    name: "Коридор",
-    left: "610px",
-    top: "419px",
-    width: "26px",
-    height: "52px",
-    roomNumber: "20",
-    section: "Служебная",
-  },
-  {
-    id: "666486e2-a728-4b85-9709-283220fcc628",
-    name: "Санузел",
-    left: "635px",
-    top: "419px",
-    width: "10px",
-    height: "52px",
-    roomNumber: "21",
-    section: "Служебная",
-  },
-  {
-    id: "673df938-ef9e-452e-84c6-80f3e9be27e3",
-    name: "Санузел",
-    left: "578px",
-    top: "419px",
-    width: "33px",
-    height: "52px",
-    roomNumber: "22",
-    section: "Служебная",
-  },
-  {
-    id: "81920576-26f9-4c8e-b028-f0b962bd6588",
-    name: "Санузел",
-    left: "548px",
-    top: "419px",
-    width: "31px",
-    height: "40px",
-    roomNumber: "23",
-    section: "Сценографическая",
-    clipPath: " polygon(0px 0, 100% 0%, 100% 100%, 0% 80%)",
-  },
-  {
-    id: "bd09eea7-d861-4cdb-befb-26546b9d7c1b",
-    name: "Кладовая",
-    left: "532px",
-    top: "419px",
-    width: "17px",
-    height: "31px",
-    roomNumber: "24",
-    section: "Сценографическая",
-    clipPath: " polygon(10px 0, 100% 0%, 100% 100%, 10% 100%)",
-  },
-  {
-    id: "3872b72c-d164-441f-963e-3c9ec5362385",
-    name: "Коридор",
-    left: "525px",
-    top: "419px",
-    width: "12px",
-    height: "39px",
-    roomNumber: "25",
-    section: "Сценографическая",
-    transform: "rotate(8deg)",
-  },
-  {
-    id: "3872b72c-d164-441f-963e-3c9ec5362385",
-    name: "Коридор",
-    left: "534px",
-    top: "452px",
-    width: "46px",
-    height: "12px",
-    roomNumber: "25",
-    section: "Сценографическая",
-    transform: "rotate(12deg)",
-  },
-  {
-    id: "8d1cb208-4ebf-497d-9cd3-b05dc462632c",
-    name: "Коридор",
-    left: "485px",
-    top: "295px",
-    width: "14px",
-    height: "113px",
-    roomNumber: "26",
-    section: "Сценографическая",
-    transform: "rotate(8deg)",
-  },
-
-  {
-    id: "e9c8b513-ec90-4195-8e94-0f8d66288855",
-    name: "Инженерная комната",
-    left: "502px",
-    top: "414px",
-    width: "25px",
-    height: "32px",
-    roomNumber: "27",
-    transform: "rotate(12deg)",
-    zIndex: "10",
-    section: "Сценографическая",
-  },
-  {
-    id: "200c9eda-ee76-4fa3-b41e-6105cea1c20b",
-    name: "Инженерная комната",
-    left: "475px",
-    top: "411px",
-    width: "52px",
-    height: "40px",
-    roomNumber: "28",
-    transform: "rotate(13deg)",
-    section: "Сценографическая",
-  },
-  {
-    id: "5b45e450-502f-4836-b1ef-fd9947e0b23b",
-    name: "Санузел",
-    left: "539px",
-    top: "410px",
-    width: "18px",
-    height: "10px",
-    roomNumber: "29",
-    section: "Сценографическая",
-  },
-  {
-    id: "9ab35c83-9ba2-4209-b0c4-2fbd8bae2f16",
-    name: "Грим-уборная",
-    left: "535px",
-    top: "384px",
-    width: "22px",
-    height: "27px",
-    roomNumber: "30",
-    section: "Сценографическая",
-    clipPath: " polygon(10px 0, 100% 0%, 100% 100%, 11% 100%)",
-  },
-  {
-    id: "59d19aa1-095e-4cf3-b27b-e6ba20b1c4f0",
-    name: "Комната отдыха",
-    left: "556px",
-    top: "384px",
-    width: "21px",
-    height: "36px",
-    roomNumber: "31",
-    section: "Сценографическая",
-  },
-  {
-    id: "30851853-3d9c-4475-9cc7-3ccdb9a4ff6d",
-    name: "Грим-уборная",
-    left: "576px",
-    top: "395px",
-    width: "24px",
-    height: "14px",
-    roomNumber: "32",
-    section: "Сценографическая",
-  },
-  {
-    id: "84bb9d7d-671c-411c-9b6e-8fa7fcd99e1a",
-    name: "Санузел",
-    left: "576px",
-    top: "408px",
-    width: "24px",
-    height: "12px",
-    roomNumber: "33",
-    section: "Сценографическая",
-  },
-  {
-    id: "a0735884-5660-44c9-9e53-96c2ad603b89",
-    name: "Чайная комната",
-    left: "599px",
-    top: "384px",
-    width: "82px",
-    height: "36px",
-    roomNumber: "34",
-    section: "Сценографическая",
-  },
-  {
-    id: "3e627079-56f9-435f-9579-da6562a7c562",
-    name: "Электрощитовая",
-    left: "656px",
-    top: "400px",
-    width: "25px",
-    height: "20px",
-    roomNumber: "35",
-    zIndex: "10",
-    section: "Сценографическая",
-  },
-  {
-    id: "30ed00ef-9dee-4a5a-b259-a1d8e12bd935",
-    name: "Коридор",
-    left: "540px",
-    top: "355px",
-    width: "141px",
-    height: "30px",
-    roomNumber: "36",
-    section: "Сценографическая",
-    clipPath: " polygon(10px 0, 100% 0%, 100% 100%, 2% 100%)",
-  },
-  {
-    id: "5ee15df5-281a-4ee4-ae1f-826eb338f5fc",
-    name: "Тамбур",
-    left: "576px",
-    top: "384px",
-    width: "24px",
-    height: "12px",
-    roomNumber: "36/1",
-    section: "Сценографическая",
-  },
-
-  {
-    id: "6c5c7683-f9b4-46ec-8402-a18b8c017c92",
-    name: "Коридор",
-    left: "680px",
-    top: "217px",
-    width: "19px",
-    height: "240px",
-    roomNumber: "37",
-    section: "Сценографическая",
-  },
-
-  {
-    id: "6c5c7683-f9b4-46ec-8402-a18b8c017c92",
-    name: "Коридор",
-    left: "698px",
-    top: "217px",
-    width: "82px",
-    height: "26px",
-    roomNumber: "37",
-    section: "Сценографическая",
-  },
-  {
-    id: "2daeb948-6bda-41e0-881f-e22c624a468c",
-    name: "Коридор",
-    left: "698px",
-    top: "242px",
-    width: "82px",
-    height: "17px",
-    roomNumber: "37/1",
-    section: "Сценографическая",
-  },
-  {
-    id: "0375d6ba-00f4-4b5f-ab00-6cfb3c9fde1a",
-    name: "Костюмерная",
-    left: "639px",
-    top: "318px",
-    width: "42px",
-    height: "38px",
-    roomNumber: "38",
-    section: "Сценографическая",
-  },
-  {
-    id: "3ab9ce24-9dc4-43aa-8018-e812e277b7fb",
-    name: "Костюмерная",
-    left: "602px",
-    top: "325px",
-    width: "38px",
-    height: "31px",
-    roomNumber: "39",
-    section: "Сценографическая",
-  },
-  {
-    id: "f98f7af6-2ab4-4518-8664-c4325535d7af",
-    name: "Грим-уборные",
-    left: "545px",
-    top: "297px",
-    width: "58px",
-    height: "59px",
-    roomNumber: "40",
-    section: "Сценографическая",
-    clipPath: " polygon(12px 0, 100% 0%, 100% 100%, 0% 100%)",
-  },
-
-  {
-    id: "c72c644a-4c1d-417b-9669-e28a27019915",
-    name: "Санузел",
-    left: "602px",
-    top: "297px",
-    width: "21px",
-    height: "29px",
-    roomNumber: "41/1",
-    section: "Гостевая",
-  },
-  {
-    id: "96aa4d4c-7506-4b8b-98be-63ea3ea06aed",
-    name: "Душевая",
-    left: "622px",
-    top: "297px",
-    width: "18px",
-    height: "29px",
-    roomNumber: "41/2",
-    section: "Гостевая",
-  },
-  {
-    id: "2312f891-b44f-4ac9-b589-fae2da5661a7",
-    name: "Кладовая",
-    left: "639px",
-    top: "297px",
-    width: "24px",
-    height: "22px",
-    roomNumber: "42",
-    section: "Гостевая",
-  },
-  {
-    id: "5f201162-02c1-4366-9dd5-76680a05f113",
-    name: "Служебное помещение",
-    left: "662px",
-    top: "297px",
-    width: "19px",
-    height: "22px",
-    roomNumber: "42м",
-    section: "Гостевая",
-  },
-  {
-    id: "415360bf-b380-4e5e-823c-b9be92d03a7b",
-    name: "Коридор",
-    left: "492px",
-    top: "288px",
-    width: "189px",
-    height: "10px",
-    roomNumber: "43",
-    section: "Гостевая",
-  },
-  {
-    id: "415360bf-b380-4e5e-823c-b9be92d03a7b",
-    name: "Коридор",
-    left: "538px",
-    top: "295px",
-    width: "10px",
-    height: "125px",
-    roomNumber: "43",
-    transform: "rotate(8deg)",
-    section: "Гостевая",
-  },
-  {
-    id: "81d9e53f-0fbe-49f9-8064-a4884f1cc2ed",
-    name: "Кабинет",
-    left: "642px",
-    top: "257px",
-    width: "19px",
-    height: "31px",
-    roomNumber: "44/1",
-    section: "Гостевая",
-  },
-  {
-    id: "9a3a739a-2d0f-4e2b-82cf-7d87a74cb260",
-    name: "Кабинет врача",
-    left: "660px",
-    top: "257px",
-    width: "21px",
-    height: "31px",
-    roomNumber: "44/2",
-    section: "Гостевая",
-  },
-  {
-    id: "a089fa89-f57c-4f1a-ae69-2b6fe2a7baf1",
-    name: "Кабинет",
-    left: "622px",
-    top: "248px",
-    width: "21px",
-    height: "41px",
-    roomNumber: "45",
-    section: "Гостевая",
-  },
-  {
-    id: "cc79c619-10c8-4ecb-b37d-99a85a6e7c87",
-    name: "Кабинет",
-    left: "582px",
-    top: "248px",
-    width: "41px",
-    height: "41px",
-    roomNumber: "46",
-    section: "Гостевая",
-  },
-  {
-    id: "501d740d-82ad-4eb5-b144-cda0dedc5181",
-    name: "Кабинет",
-    left: "565px",
-    top: "248px",
-    width: "18px",
-    height: "41px",
-    roomNumber: "47",
-    section: "Гостевая",
-  },
-  {
-    id: "97c758a3-6591-4f47-afa5-5b33f0d624f7",
-    name: "Приемная",
-    left: "538px",
-    top: "248px",
-    width: "28px",
-    height: "41px",
-    roomNumber: "48",
-    section: "Гостевая",
-  },
-  {
-    id: "14043cb3-d499-436d-9af0-a11323c32a6c",
-    name: "Санузел",
-    left: "538px",
-    top: "217px",
-    width: "12px",
-    height: "32px",
-    roomNumber: "49",
-    section: "Гостевая",
-  },
-  {
-    id: "602ba6b9-ab5b-42c8-b56c-55e469742ccf",
-    name: "Кабинет",
-    left: "549px",
-    top: "217px",
-    width: "48px",
-    height: "32px",
-    roomNumber: "50",
-    section: "Гостевая",
-  },
-  {
-    id: "daaac814-d605-4eae-beaf-aba6c285e558",
-    name: "Кабинет",
-    left: "596px",
-    top: "217px",
-    width: "27px",
-    height: "32px",
-    roomNumber: "51",
-    section: "Гостевая",
-  },
-  {
-    id: "Инженерная комната",
-    name: "Кабинет",
-    left: "622px",
-    top: "217px",
-    width: "21px",
-    height: "32px",
-    roomNumber: "52",
-    section: "Гостевая",
-  },
-  {
-    id: "c54e3bd6-c90a-491b-83e5-550ebc5f9d2b",
-    name: "Кладовая",
-    left: "642px",
-    top: "217px",
-    width: "39px",
-    height: "41px",
-    roomNumber: "53",
-    section: "Гостевая",
-  },
-  {
-    id: "ff011e19-2abd-499c-9737-2a7768d350d0",
-    name: "Кабинет",
-    left: "679px",
-    top: "165px",
-    width: "15px",
-    height: "53px",
-    roomNumber: "54",
-    section: "Гостевая",
-  },
-  {
-    id: "ff011e19-2abd-499c-9737-2a7768d350d0",
-    name: "Кабинет",
-    left: "716px",
-    top: "182px",
-    width: "15px",
-    height: "36px",
-    roomNumber: "55",
-    section: "Гостевая",
-  },
-  {
-    id: "5cfe34b3-6d7b-4060-83fa-66ba25efa0ee",
-    name: "Помещение приема пищи",
-    left: "730px",
-    top: "182px",
-    width: "28px",
-    height: "36px",
-    roomNumber: "55/1",
-    section: "Гостевая",
-  },
-  {
-    id: "1d02cb89-3da9-4ade-8628-c7a8738fe68d",
-    name: "Санузел",
-    left: "757px",
-    top: "188px",
-    width: "23px",
-    height: "30px",
-    roomNumber: "56",
-    section: "Гостевая",
-  },
-  {
-    id: "5bac18b9-5cfb-46b8-8a40-00c2096bbe1f",
-    name: "Санузел",
-    left: "779px",
-    top: "188px",
-    width: "34px",
-    height: "33px",
-    roomNumber: "57",
-    section: "Гостевая",
-    clipPath: " polygon(0% 0, 100% 22%, 100% 100%, 0% 100%)",
-  },
-  {
-    id: "46dd4eb2-dfc2-4a1c-b799-3e85ac733baa",
-    name: "Техническое помещение",
-    left: "812px",
-    top: "180px",
-    width: "47px",
-    height: "22px",
-    roomNumber: "58",
-    section: "Гостевая",
-    clipPath: " polygon(0% 0, 100% 35%, 100% 100%, 0% 100%)",
-  },
-  {
-    id: "46dd4eb2-dfc2-4a1c-b799-3e85ac733baa",
-    name: "Техническое помещение",
-    left: "779px",
-    top: "172px",
-    width: "34px",
-    height: "25px",
-    roomNumber: "58/1",
-    clipPath: " polygon(0% 0, 100% 0%, 100% 100%, 0% 70%)",
-  },
-  {
-    id: "46dd4eb2-dfc2-4a1c-b799-3e85ac733baa",
-    name: "Техническое помещение",
-    left: "716px",
-    top: "165px",
-    width: "42px",
-    height: "18px",
-    roomNumber: "58/1",
-  },
-  {
-    id: "46dd4eb2-dfc2-4a1c-b799-3e85ac733baa",
-    name: "Техническое помещение",
-    left: "757px",
-    top: "165px",
-    width: "23px",
-    height: "24px",
-    roomNumber: "58/1",
-  },
-  {
-    id: "3ba4d7f1-c22d-494d-aede-947a1a06bae7",
-    name: "Тамбур",
-    left: "812px",
-    top: "201px",
-    width: "19px",
-    height: "20px",
-    roomNumber: "59",
-    section: "Гостевая",
-  },
-
-  {
-    id: "650dc353-3867-4b57-9bc8-7e3fada324da",
-    name: "Коридор",
-    left: "779px",
-    top: "220px",
-    width: "80px",
-    height: "13px",
-    roomNumber: "60",
-    section: "Гостевая",
-  },
-  {
-    id: "650dc353-3867-4b57-9bc8-7e3fada324da",
-    name: "Коридор",
-    left: "836px",
-    top: "236px",
-    width: "188px",
-    height: "19px",
-    roomNumber: "60",
-    section: "Гостевая",
-  },
-  {
-    id: "d6c021bf-d605-460f-b2f2-8af1698cd6da",
-    name: "Тамбур",
-    left: "989px",
-    top: "254px",
-    width: "45px",
-    height: "10px",
-    roomNumber: "61",
-    section: "Гостевая",
-  },
-  {
-    id: "506e42b5-1a2c-4932-ab55-37d23bc2027b",
-    name: "Бытовое помещение",
-    left: "989px",
-    top: "263px",
-    width: "17px",
-    height: "31px",
-    roomNumber: "61/1",
-    section: "Гостевая",
-  },
-  {
-    id: "8f644e73-36cf-4586-9b4b-31cd9b7704c3",
-    name: "Бытовое помещение",
-    left: "1005px",
-    top: "263px",
-    width: "29px",
-    height: "31px",
-    roomNumber: "61/2",
-    section: "Гостевая",
-  },
-
-  {
-    id: "5eb15d58-479a-4404-aaad-db2c433bd40d",
-    name: "Кладовая",
-    left: "889px",
-    top: "480px",
-    width: "36px",
-    height: "34px",
-    roomNumber: "62",
-  },
-
-  {
-    id: "5eb15d58-479a-4404-aaad-db2c433bd40d",
-    name: "Кладовая",
-    left: "912px",
-    top: "420px",
-    width: "13px",
-    height: "61px",
-    roomNumber: "62",
-  },
-
-  {
-    id: "c1108216-2524-4901-932c-4f14015c018b",
-    name: "Тамбур",
-    left: "912px",
-    top: "345px",
-    width: "13px",
-    height: "76px",
-    roomNumber: "63",
-  },
-  {
-    id: "d3c16283-b825-489b-be15-634287634cf9",
-    name: "Электрощитовая",
-    left: "897px",
-    top: "325px",
-    width: "28px",
-    height: "21px",
-    roomNumber: "63/1",
-    clipPath: " polygon(0px 0, 100% 0%, 100% 80%, 100% 100%, 40% 100%)",
-  },
-
-  {
-    id: "4decd71b-adfd-4e48-a7aa-6f02d9e5f341",
-    name: "Кладовая",
-    left: "779px",
-    top: "232px",
-    width: "47px",
-    height: "27px",
-    roomNumber: "64",
-  },
-  {
-    id: "7ca9d3ff-4b8c-45b2-90e0-e027806a4242",
-    name: "Репетиционный зал",
-    left: "495px",
-    top: "335px",
-    width: "42px",
-    height: "80px",
-    roomNumber: "65",
-    transform: "rotate(8deg)",
-  },
-  {
-    id: "3bd38c33-302d-47f0-bcde-05b869877eb8",
-    name: "Грим-уборная",
-    left: "501px",
-    top: "295px",
-    width: "43px",
-    height: "42px",
-    roomNumber: "66",
-    transform: "rotate(6deg)",
-  },
-  {
-    id: "37f73cb2-4385-4909-9b4e-ee46cfc47116",
-    name: "Санузел",
-    left: "518px",
-    top: "320px",
-    width: "9px",
-    height: "17px",
-    roomNumber: "66/1",
-    transform: "rotate(6deg)",
-  },
-  {
-    id: "f90146a9-5752-4630-a3cf-ded80e09367f",
-    name: "Душевая",
-    left: "526px",
-    top: "321px",
-    width: "16px",
-    height: "17px",
-    roomNumber: "66/2",
-    transform: "rotate(6deg)",
-  },
-  {
-    id: "b439ded7-8cc3-43a7-a080-125f0511ec25",
-    name: "Санузел",
-    left: "830px",
-    top: "201px",
-    width: "29px",
-    height: "20px",
-    roomNumber: "67",
-  },
-
-  {
-    id: "dbc81d46-8197-46db-b69c-78c73e271fd6",
-    name: "Лестница",
-    left: "835px",
-    top: "258px",
-    width: "57px",
-    height: "20px",
-    roomNumber: "68",
-  },
-
-  {
-    id: "dbc81d46-8197-46db-b69c-78c73e271fd6",
-    name: "Лестница",
-    left: "877px",
-    top: "277px",
-    width: "15px",
-    height: "31px",
-    roomNumber: "68",
-  },
-];
 const MainPage = () => {
   const { products, isLoading: productsLoading } = useProducts();
   const { getCategoryColor } = useProductColors(products);
   const [hoveredSection, setHoveredSection] = useState<string | null>(null);
 
-  // Состояние для режима инвентаризации
   const [isInventoryMode, setIsInventoryMode] = useState(false);
   const {
     getRoomStatus,
     getRoomDetails,
     loading: inventoryLoading,
     selectedReport,
+    loadReportById,
   } = useInventoryReport();
-  //удалить
-  const rooms = ROOMS;
-  //раскоментить когда перенесу массив назад
-  // const [rooms] = useState<Room[]>(ROOMS);
+  const [showWarehouse, setShowWarehouse] = useState(false);
+
+  const rooms = showWarehouse ? ROOMS_WAREHOUSE : ROOMS_THEATER;
+
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [inventoryModalOpen, setInventoryModalOpen] = useState(false);
   const [roomProducts, setRoomProducts] = useState<Product[]>([]);
   const [openProductId, setOpenProductId] = useState<string | null>(null);
+  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
 
-  // Логирование для отладки
+  const handleInventoryModeChange = (isActive: boolean) => {
+    setIsInventoryMode(isActive);
+
+    if (!isActive) {
+      setSelectedReportId(null);
+    }
+  };
+
+  const handleSelectReportForDisplay = async (reportId: string) => {
+    console.log("📊 handleSelectReportForDisplay вызван с reportId:", reportId);
+    setSelectedReportId(reportId);
+    try {
+      await loadReportById(reportId);
+      console.log("✅ Отчет загружен, selectedReport:", selectedReport);
+      setIsInventoryMode(true);
+    } catch (error) {
+      console.error("❌ Ошибка загрузки отчета:", error);
+    }
+  };
+
   useEffect(() => {
+    console.log("📊 Режим просмотра:", showWarehouse ? "Склад" : "Театр");
     console.log("📊 Режим инвентаризации:", isInventoryMode);
-    console.log("📊 Выбранный отчет:", selectedReport);
-  }, [isInventoryMode, selectedReport]);
-
-  useEffect(() => {
-    console.log("🏠 ID комнат из констант:");
-    ROOMS.forEach((room) => {
-      console.log(`  ${room.name}: ${room.id} (№${room.roomNumber})`);
-    });
-  }, []);
+    console.log("📊 Выбранный отчет:", selectedReport?.report_id);
+    console.log("📊 Выбранный ID отчета:", selectedReportId);
+  }, [showWarehouse, isInventoryMode, selectedReport, selectedReportId]);
 
   useEffect(() => {
     if (selectedReport) {
       console.log("📋 Комнаты из отчета:");
       selectedReport.rooms?.forEach((room) => {
         console.log(
-          `  ${room.room_name}: ${room.room_id} (№${room.room_number})`,
+          `  ${room.room_name}: ${room.room_id} (№${room.room_number}) - секция: ${room.room_section || room.section}`,
         );
       });
     }
   }, [selectedReport]);
 
-  // Фильтруем товары для выбранной комнаты
   useEffect(() => {
     if (selectedRoom && modalOpen) {
       console.log("Фильтруем товары для комнаты:", selectedRoom.roomNumber);
@@ -1291,7 +101,6 @@ const MainPage = () => {
     }
   }, [selectedRoom, modalOpen, products]);
 
-  // Считаем общую стоимость товаров в комнате
   const totalPrice = useMemo(() => {
     return roomProducts.reduce((sum, product) => sum + (product.price || 0), 0);
   }, [roomProducts]);
@@ -1331,7 +140,7 @@ const MainPage = () => {
   const handleViewClick = (item: any) => {
     console.log("Просмотр товара:", item);
   };
-  //цвет секций
+
   const getSectionColor = (
     section: string | undefined,
     opacity: number = 0.3,
@@ -1341,40 +150,54 @@ const MainPage = () => {
 
     switch (section) {
       case "Сценографическая":
-        return `rgba(170, 220, 180, 0.2)`; // Золотой/желтый
+        return `rgba(170, 220, 180, 0.2)`;
       case "Служебная":
-        return `rgba(200, 180, 240, 0.2)`; // Фиолетовый
+        return `rgba(200, 180, 240, 0.2)`;
       case "Гостевая":
-        return `rgba(160, 220, 220, 0.2)`; // Синий
+        return `rgba(160, 220, 220, 0.2)`;
+      case "Склад":
+        return `rgba(100, 150, 200, 0.3)`;
       default:
         return null;
     }
   };
-  // Функция для получения цвета комнаты в режиме инвентаризации
+
+  const roomsForProductList = useMemo(() => {
+    return rooms.map((room) => ({
+      id: room.id,
+      room_id: room.id,
+      name: room.name,
+      number: room.roomNumber,
+      floor: 1,
+      building: showWarehouse ? "warehouse" : "theatre",
+    }));
+  }, [rooms, showWarehouse]);
+
   const getRoomColor = (roomId: string) => {
     if (!isInventoryMode) {
-      return "rgba(84, 134, 86, 0)"; // Обычный цвет
+      return showWarehouse
+        ? "rgba(100, 150, 200, 0.2)"
+        : "rgba(84, 134, 86, 0)";
     }
 
     const status = getRoomStatus(roomId);
 
     if (!status) {
-      return "rgba(158, 158, 158, 0.2)"; // Серая - нет данных
+      return "rgba(158, 158, 158, 0.2)";
     }
 
     switch (status.status) {
       case "success":
-        return "rgba(62, 151, 65, 0.34)"; // Зеленый
+        return "rgba(1, 66, 2, 0.25)";
       case "warning":
-        return "rgba(255, 152, 0, 0.3)"; // Оранжевый
+        return "rgba(255, 152, 0, 0.3)";
       case "danger":
-        return "rgba(244, 67, 54, 0.3)"; // Красный
+        return "rgba(87, 7, 1, 0.43)";
       default:
         return "rgba(158, 158, 158, 0.2)";
     }
   };
 
-  // Функция для получения цвета границы комнаты
   const getRoomBorderColor = (roomId: string) => {
     if (!isInventoryMode) return "#f3f5f300";
 
@@ -1395,12 +218,27 @@ const MainPage = () => {
 
   return (
     <div className="main-page">
-      <HeaderMain onInventoryModeChange={setIsInventoryMode} />
+      <HeaderMain
+        onInventoryModeChange={handleInventoryModeChange}
+        onSelectReportForDisplay={handleSelectReportForDisplay}
+        isInventoryMode={isInventoryMode}
+        selectedReportId={selectedReportId}
+      />
+
+      <button
+        className="sklad__bitton"
+        onClick={() => setShowWarehouse(!showWarehouse)}
+      >
+        {showWarehouse ? "Переключиться на театр" : "Переключиться на склад"}
+      </button>
+      <div className="logo__svg">
+        <img className="logo" src="/crave_logo.svg" alt="" />
+      </div>
 
       <div className="zoom-container zoom-wrapper">
         <TransformWrapper
-          initialScale={1.5}
-          minScale={1.5}
+          initialScale={showWarehouse ? 1 : 1.5}
+          minScale={showWarehouse ? 0.5 : 1.5}
           maxScale={5}
           wheel={{ step: 0.2 }}
           pinch={{ step: 5 }}
@@ -1418,21 +256,40 @@ const MainPage = () => {
             }}
           >
             <div className="main-content">
-              <img
-                className="main-content-svg"
-                src="/1515.svg"
-                alt="План помещения"
-              />
+              {/* Показываем фоновое изображение в зависимости от режима */}
+              {!showWarehouse ? (
+                <img
+                  className="main-content-svg"
+                  src="/1515.svg"
+                  alt="План театра"
+                />
+              ) : (
+                <div className="warehouse-bg">
+                  <img
+                    className="warehouse-image"
+                    src="/sklad123(1).svg"
+                    alt="План склада"
+                  />
+                  <img
+                    className="warehouse-image"
+                    src="/sklad123(2).svg"
+                    alt="План склада"
+                  />
+                </div>
+              )}
 
+              {/* Рендерим комнаты из выбранного массива */}
               {rooms.map((room) => {
                 const status = isInventoryMode ? getRoomStatus(room.id) : null;
                 let backgroundColor = getRoomColor(room.id);
+
                 if (hoveredSection && room.section === hoveredSection) {
                   backgroundColor =
                     getSectionColor(room.section, 0.5) || backgroundColor;
                 } else if (hoveredSection && room.section !== hoveredSection) {
-                  backgroundColor = "rgba(0, 0, 0, 0.1)"; // Затемнение
+                  backgroundColor = "rgba(0, 0, 0, 0.1)";
                 }
+
                 return (
                   <div
                     key={room.id}
@@ -1447,8 +304,10 @@ const MainPage = () => {
                       borderRadius: room.borderRadius,
                       backgroundColor: backgroundColor,
                       borderColor: getRoomBorderColor(room.id),
-                      borderWidth: isInventoryMode ? "1px" : "1px",
+                      borderWidth: isInventoryMode ? "2px" : "1px",
                       transition: "all 0.2s ease",
+                      cursor: "pointer",
+                      zIndex: room.zIndex || "auto",
                     }}
                     onClick={() => handleRoomClick(room)}
                     onMouseEnter={() =>
@@ -1457,20 +316,27 @@ const MainPage = () => {
                     onMouseLeave={() => setHoveredSection(null)}
                     data-tooltip={`${room.name} (№${room.roomNumber})${room.section ? ` [${room.section}]` : ""}`}
                   >
-                    {isInventoryMode && status && status.hasIssues && (
-                      <div className="room-status-badge">
-                        {status.missingCount > 0 && (
-                          <span className="status-missing">
-                            📦 {status.missingCount}
-                          </span>
-                        )}
-                        {status.wrongCount > 0 && (
-                          <span className="status-wrong">
-                            ↺ {status.wrongCount}
-                          </span>
-                        )}
-                      </div>
+                    {/* Показываем название на блоках склада */}
+                    {showWarehouse && (
+                      <div className="warehouse-room-label">{room.name}</div>
                     )}
+
+                    {isInventoryMode &&
+                      status &&
+                      (status.hasMissing || status.hasWrong) && (
+                        <div className="room-status-badge">
+                          {status.missingCount > 0 && (
+                            <span className="status-missing">
+                              📦 {status.missingCount}
+                            </span>
+                          )}
+                          {status.wrongCount > 0 && (
+                            <span className="status-wrong">
+                              ↺ {status.wrongCount}
+                            </span>
+                          )}
+                        </div>
+                      )}
                   </div>
                 );
               })}
@@ -1489,7 +355,9 @@ const MainPage = () => {
 
             <div className="modal-header">
               <h2>{selectedRoom.name}</h2>
-              <p className="room-number">Комната №{selectedRoom.roomNumber}</p>
+              <p className="room-number">
+                {showWarehouse ? "Склад" : "Комната"} №{selectedRoom.roomNumber}
+              </p>
             </div>
 
             {productsLoading ? (
@@ -1503,7 +371,7 @@ const MainPage = () => {
                   </div>
                   <div className="stat-item">
                     <span className="stat-label">Общая стоимость:</span>
-                    <span className="stat-value price">
+                    <span className="stat-value stat-value">
                       {totalPrice.toLocaleString()} ₽
                     </span>
                   </div>
@@ -1516,10 +384,12 @@ const MainPage = () => {
                     onProductClick={handleProductClick}
                     onViewClick={handleViewClick}
                     getCategoryColor={getCategoryColor}
+                    showWrittenOff={false}
+                    rooms={roomsForProductList}
                   />
                 ) : (
                   <div className="no-products">
-                    <p>В этой комнате нет товаров</p>
+                    <p>В этом помещении нет МЦ</p>
                   </div>
                 )}
               </>

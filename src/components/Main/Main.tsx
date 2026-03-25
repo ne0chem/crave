@@ -1,11 +1,12 @@
 import "./Main.css";
-import { useState, useEffect } from "react"; // 👈 Добавляем useEffect
+import { useState, useEffect } from "react";
 import "./style/main.css";
 import "./style/leftMenu.css";
 import "./style/filter.css";
 import { useProducts } from "../../contexts/ProductsContext";
-import { Link, useLocation } from "react-router-dom"; // 👈 Добавляем useLocation
-import { useAuth } from "../../contexts/DummyAuthContext";
+import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import { useRooms } from "../../contexts/RoomsContext";
 import Filtres from "../Filtres/Filtres";
 import { useProductFilters } from "../../hooks/useProductFilters";
 import { useProductColors } from "../../hooks/useProductColors";
@@ -19,7 +20,7 @@ import WordPreviewModal from "../Modal/ReportModal/WordPreviewModal";
 
 const Main = () => {
   const { logout } = useAuth();
-  const location = useLocation(); // 👈 Получаем location для доступа к state
+  const location = useLocation();
 
   const {
     products,
@@ -29,13 +30,13 @@ const Main = () => {
     writeoffProduct,
   } = useProducts();
 
-  // Состояния
+  const { rooms: allRooms, isLoading: roomsLoading, fetchRooms } = useRooms();
+
   const [showWrittenOff, setShowWrittenOff] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewContent, setPreviewContent] = useState("");
 
-  // Выбираем какой массив показывать
   const currentProducts = showWrittenOff ? writtenOffProducts : products;
 
   const filters = useProductFilters(currentProducts);
@@ -43,18 +44,17 @@ const Main = () => {
 
   const [openProductId, setOpenProductId] = useState<string | null>(null);
 
-  // 👈 Эффект для установки выбранной секции из state при загрузке
   useEffect(() => {
-    // Проверяем, есть ли переданная секция в state
     if (location.state?.selectedSection) {
       filters.setSelectedSection(location.state.selectedSection);
-      // Очищаем state, чтобы при обновлении страницы секция не сбрасывалась
-      // но при этом не применялась снова при возврате на страницу
       window.history.replaceState({}, document.title);
     }
-  }, [location.state]); // Зависимость от location.state
+  }, [location.state]);
 
-  // Состояние для модалки
+  useEffect(() => {
+    fetchRooms();
+  }, [fetchRooms]);
+
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
     type: ModalType | null;
@@ -65,16 +65,15 @@ const Main = () => {
     data: null,
   });
 
-  // Данные для комнат
-  const rooms: Room[] = [
-    { id: "1", name: "Кабинет 101", number: "1", floor: 1, building: "dd" },
-    { id: "2", name: "Склад №1", number: "1", floor: 1, building: "dd" },
-    { id: "3", name: "Актовый зал", number: "1", floor: 1, building: "dd" },
-    { id: "4", name: "Кабинет 102", number: "1", floor: 1, building: "dd" },
-    { id: "5", name: "Склад №2", number: "1", floor: 1, building: "dd" },
-  ];
+  const rooms: Room[] = allRooms.map((room) => ({
+    id: room.room_id,
+    room_id: room.room_id,
+    name: room.name,
+    number: room.number,
+    floor: (room as any).floor_number || 1,
+    building: (room as any).building || "theatre",
+  }));
 
-  // Категории
   const categories: string[] = [
     "Офисная мебель",
     "Мебель",
@@ -100,7 +99,6 @@ const Main = () => {
 
   const { getCategoryColor, getSectionColor } = colors;
 
-  // Функции для открытия модалок
   const openModal = (type: ModalType, data: any = null) => {
     setModalState({
       isOpen: true,
@@ -117,12 +115,10 @@ const Main = () => {
     });
   };
 
-  // Обработчик клика по товару
   const handleProductClick = (productId: string) => {
     setOpenProductId(openProductId === productId ? null : productId);
   };
 
-  // Обработчик просмотра товара
   const handleViewClick = (product: any) => {
     openModal(ModalType.ITEM_VIEW, {
       id: product.id,
@@ -140,7 +136,6 @@ const Main = () => {
     });
   };
 
-  // Обработчик редактирования товара (только для активных)
   const handleEditClick = (product: any) => {
     if (showWrittenOff) return;
 
@@ -155,8 +150,6 @@ const Main = () => {
       info: product.description || "",
     });
   };
-
-  // Обработчик списания товара (только для активных)
   const handleWriteoffClick = (product: any) => {
     if (showWrittenOff) return;
 
@@ -166,7 +159,6 @@ const Main = () => {
     });
   };
 
-  // Сохранение нового товара
   const handleAddProduct = (formData: any) => {
     const selectedRoom = rooms.find((room) => room.id === formData.roomId);
 
@@ -204,42 +196,60 @@ const Main = () => {
     closeModal();
   };
 
-  // Сохранение изменений товара
   const handleEditProduct = (formData: any) => {
     if (!modalState.data?.id) return;
+
+    const selectedRoom = rooms.find((room) => room.id === formData.roomId);
+
+    console.log("📝 Редактирование товара:", {
+      formData,
+      selectedRoom,
+      roomId: formData.roomId,
+    });
 
     const updatedProduct = {
       id: modalState.data.id,
       name: formData.name,
       inventory_tools_type: formData.category,
-      room_name: formData.roomName,
-      room_id: formData.roomId,
+      description: formData.info || null,
       price: parseFloat(formData.price),
       inv_number: formData.inventNumber,
-      description: formData.info,
+
+      room_id:
+        formData.roomId && formData.roomId !== "" ? formData.roomId : undefined,
+      room_name: selectedRoom?.name || formData.roomName,
+      room_number: selectedRoom?.number || "",
+      building: selectedRoom?.building || "",
+      floor_number: selectedRoom?.floor || 0,
+      section: formData.category,
     };
 
-    updateProduct(updatedProduct);
+    const cleanedProduct = Object.fromEntries(
+      Object.entries(updatedProduct).filter(
+        ([_, value]) => value !== undefined,
+      ),
+    );
+
+    console.log("📤 Отправляем на обновление:", cleanedProduct);
+    updateProduct(cleanedProduct as any);
     closeModal();
   };
 
-  // Обработчик списания
   const handleWriteoff = (formData: any) => {
+    console.log("📝 handleWriteoff получил:", formData);
+
     if (modalState.data?.id) {
       writeoffProduct({
         productId: modalState.data.id,
-        reason: formData.actionReason,
-        date: formData.actionDate,
-        person: formData.actionPerson,
+        reason: formData.reason,
+        date: formData.date,
+        person: formData.written_off_by,
       });
     }
 
-    openModal(ModalType.CONFIRM, {
-      message: `МЦ "${modalState.data?.name}" успешно списан`,
-    });
+    closeModal();
   };
 
-  // Обработчик генерации отчета
   const handleGenerateReport = (format: "excel" | "word") => {
     const options: ReportOptions = {
       format,
@@ -259,8 +269,6 @@ const Main = () => {
 
     setIsReportModalOpen(false);
   };
-
-  // Обработчик предпросмотра Word
   const handlePreviewWord = (format: "word") => {
     const options: ReportOptions = {
       format: "word",
@@ -272,7 +280,6 @@ const Main = () => {
       showDate: true,
     };
 
-    // Генерируем HTML для предпросмотра
     const htmlContent = reportService.generateWordHTML(
       filteredProducts,
       options,
@@ -288,6 +295,9 @@ const Main = () => {
     setPreviewContent(htmlContent);
     setIsPreviewOpen(true);
   };
+
+  console.log("🏢 Комнаты в Main:", rooms);
+  console.log("📊 Количество комнат:", rooms.length);
 
   return (
     <div className="Main__container">
@@ -355,6 +365,7 @@ const Main = () => {
           {filteredProducts.length})
         </h1>
 
+        {/* 👇 ВАЖНО: передаем rooms в ProductList */}
         <ProductList
           products={filteredProducts}
           openProductId={openProductId}
@@ -364,12 +375,16 @@ const Main = () => {
           onWriteoffClick={handleWriteoffClick}
           getCategoryColor={getCategoryColor}
           showWrittenOff={showWrittenOff}
+          rooms={rooms}
         />
       </div>
 
       {/* Правое меню с фильтрами */}
       <div className="filter__conteiner">
-        <Filtres filters={filters} />
+        <Filtres
+          filters={filters}
+          rooms={rooms.map((room) => `${room.name} (№${room.number})`)}
+        />
         <div className="report__conteainer">
           <button
             className="addMZ"

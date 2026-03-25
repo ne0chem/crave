@@ -1,5 +1,3 @@
-// src/utils/wordGenerator.ts
-
 import {
   formatPrice,
   calculateTotalPrice,
@@ -11,30 +9,25 @@ import {
   InventoryItem,
 } from "../types/inventory.types";
 
-// Стили для Word документа
-// src/utils/wordStyles.ts
-
 export const wordStyles = `
-
-  
   .report {
     max-width: 1400px;
     margin: 0 auto;
+    font-family: Arial, sans-serif;
   }
   
   .header {
-    background: var(--bg-container, #eeecec);
+    background: #f5f5f5;
     padding: 20px;
-    border-radius: var(--border-radius, 1.2rem);
+    border-radius: 8px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid #e0e0e0;
   }
   
   .header p {
     margin: 5px 0;
-    color: var(--text-primary, #1a1a1a);
-    font-size: var(--fz-osnova, 1.5rem);
+    color: #333;
+    font-size: 14px;
   }
   
   .stats {
@@ -45,17 +38,16 @@ export const wordStyles = `
   }
   
   .stat-card {
-    background: var(--bg-container, #eeecec);
+    background: #f5f5f5;
     padding: 15px;
-    border-radius: calc(var(--border-radius, 1.2rem) * 0.8);
+    border-radius: 8px;
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid #e0e0e0;
   }
   
   .stat-card .label {
-    color: var(--hover-gray, #7c848a);
-    font-size: var(--fz-dop, 1.2rem);
+    color: #666;
+    font-size: 12px;
     margin-bottom: 8px;
   }
   
@@ -63,159 +55,150 @@ export const wordStyles = `
     font-size: 18px;
     font-weight: 600;
     margin-bottom: 5px;
-    color: var(--text-primary, #1a1a1a);
+    color: #333;
   }
   
   .stat-card .price {
-    color: var(--accent-gray, #999ea3);
-    font-size: var(--fz-dop, 1.2rem);
+    color: #999;
+    font-size: 12px;
     font-weight: 600;
   }
   
   .room {
-    background: var(--bg-container, #eeecec);
-    margin-bottom: 15px;
+    background: #fff;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
     overflow: hidden;
   }
   
   .room-header {
     padding: 15px 20px;
-    background: var(--input-bg, #fafafa);
+    background: #fafafa;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-bottom: 1px solid #e0e0e0;
   }
   
   .room-header h3 {
     margin: 0;
-    color: var(--text-primary, #1a1a1a);
-    font-size: var(--fz-osnova, 1.5rem);
+    color: #333;
+    font-size: 16px;
   }
   
   .room-section-badge {
-    color: var(--text-primary);
+    background: #e3f2fd;
+    color: #1976d2;
     padding: 4px 12px;
     border-radius: 20px;
-    font-size: var(--fz-dop, 1.2rem);
+    font-size: 12px;
     font-weight: 500;
   }
   
   .room-section {
     padding: 15px;
-    background: var(--input-bg, #fafafa);
-
+    background: #fff;
   }
   
   .table-container {
-    border: 1px solid var(--border-color, #e0e0e0);
-    border-radius: calc(var(--border-radius, 1.2rem) * 0.6);
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
     margin-bottom: 15px;
     overflow: hidden;
-    background: var(--input-bg, #fafafa);
-    
+    background: #fff;
   }
   
   .table-title {
     padding: 10px 15px;
-    background: var(--bg-primary, #b6b4b4);
-    color: var(--text-primary);
-    font-size: var(--fz-osnova, 1.5rem);
+    background: #f5f5f5;
+    font-size: 14px;
     font-weight: 600;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
-
+    border-bottom: 1px solid #e0e0e0;
   }
   
   .report-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: var(--fz-dop, 1.2rem);
-                        
+    font-size: 12px;
   }
   
   .report-table th {
     text-align: left;
     padding: 10px 8px;
-    background: var(--bg-primary, #b6b4b4);
-    color: var(--text-primary);
+    background: #f5f5f5;
     font-weight: 600;
-    border-bottom: 2px solid var(--border-color, #e0e0e0);
-    white-space: nowrap;
-    
-
+    border-bottom: 1px solid #e0e0e0;
   }
   
   .report-table td {
     padding: 8px;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    border-bottom: 1px solid #e0e0e0;
     vertical-align: top;
-    color: var(--text-primary);
-    
-
+    color: #333;
   }
+  
   .price-cell {
-    color: var(--text-primary);
     font-weight: 600;
     white-space: nowrap;
   }
   
   .inv-number {
     font-family: monospace;
-    font-size: calc(var(--fz-dop, 1.2rem) * 0.9);
-    color: var(--text-primary);;
+    font-size: 11px;
+    color: #666;
   }
   
   .report-table tfoot tr {
-    background: var(--bg-primary, #b6b4b4);
-    border-top: 2px solid var(--border-color, #e0e0e0);
-    
+    background: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
   }
   
   .report-table tfoot td {
     padding: 10px 8px;
     font-weight: 600;
-    color: var(--text-primary);
   }
   
   .total-label {
     text-align: right;
-    color: var(--text-primary);
   }
   
   .total-price {
-    color: var(--text-primary);
     font-weight: 600;
     white-space: nowrap;
   }
   
   .room-info-cell {
-    font-size: calc(var(--fz-dop, 1.2rem) * 0.9);
-    color: var(--hover-gray, #7c848a);
+    font-size: 11px;
+    color: #666;
     white-space: nowrap;
-    
   }
   
   .section-badge {
     display: inline-block;
-    color: var(--text-primary);
+    background: #e8eaf6;
+    color: #3f51b5;
     padding: 2px 6px;
     border-radius: 4px;
-    font-size: calc(var(--fz-dop, 1.2rem) * 0.8);
+    font-size: 10px;
     font-weight: 500;
   }
-
-
 `;
 
-// Генератор HTML отчета
+const getRoomSection = (room: InventoryRoom | undefined): string => {
+  if (!room) return "";
+  return (room as any).room_section || room.section || "";
+};
+
 export const generateReportHtml = (report: InventoryReport) => {
   const stats = getReportStats(report);
 
   const renderItemsTable = (
-    items: any[],
+    items: InventoryItem[] | undefined,
     title: string,
     room?: InventoryRoom,
   ) => {
-    if (!items?.length) return "";
+    if (!items || items.length === 0) return "";
 
     const totalPrice = calculateTotalPrice(items);
 
@@ -225,10 +208,9 @@ export const generateReportHtml = (report: InventoryReport) => {
         <table class="report-table">
           <thead>
             <tr>
-             <th>Наименование</th>
+              <th>Наименование</th>
               <th>Помещение</th>
               <th>Секция</th>
-             
               <th>Инв. номер</th>
               <th>Категория</th>
               <th>Стоимость</th>
@@ -236,29 +218,25 @@ export const generateReportHtml = (report: InventoryReport) => {
           </thead>
           <tbody>
             ${items
-              .map(
-                (item: any) => `
-                
-              <tr>
-              <td>${item.name}</td>
-                <td class="room-info-cell">
-                  ${room?.room_name || item.room_name || ""} 
-                  ${room?.room_number || item.room_number ? `(${room?.room_number || item.room_number})` : ""}
-                </td>
-                <td>
-                  ${
-                    room?.section || item.section
-                      ? `<span class="section-badge">${room?.section || item.section}</span>`
-                      : "—"
-                  }
-                </td>
-                
-                <td class="inv-number">${item.inv_number || "—"}</td>
-                <td>${item.inventory_tools_type || "Без категории"}</td>
-                <td class="price-cell">${formatPrice(item.price || 0)}</td>
-              </tr>
-            `,
-              )
+              .map((item: InventoryItem) => {
+                const section = getRoomSection(room) || item.section || "";
+
+                return `
+                  <tr>
+                    <td>${item.name}</td>
+                    <td class="room-info-cell">
+                      ${room?.room_name || item.room_name || ""} 
+                      ${room?.room_number || item.room_number ? `(${room?.room_number || item.room_number})` : ""}
+                    </td>
+                    <td>
+                      ${section ? `<span class="section-badge">${section}</span>` : "—"}
+                    </td>
+                    <td class="inv-number">${item.inv_number || "—"}</td>
+                    <td>${item.inventory_tools_type || "Без категории"}</td>
+                    <td class="price-cell">${formatPrice(item.price || 0)}</td>
+                  </tr>
+                `;
+              })
               .join("")}
           </tbody>
           <tfoot>
@@ -283,7 +261,6 @@ export const generateReportHtml = (report: InventoryReport) => {
     <body>
       <div class="report">
         <div class="header">
-          
           <p><strong>Дата:</strong> ${new Date(report.date).toLocaleString("ru-RU")}</p>
         </div>
 
@@ -306,24 +283,23 @@ export const generateReportHtml = (report: InventoryReport) => {
         </div>
 
         ${report.rooms
-          ?.map(
-            (room: InventoryRoom) => `
-          <div class="room">
-            <div class="room-header">
-              <h3>${room.room_name} (ком. ${room.room_number})</h3>
-              ${room.section ? `<span class="room-section-badge">${room.section}</span>` : ""}
-            </div>
-            <div class="room-section">
-              ${renderItemsTable(room["correct-item"], "Найденные МЦ", room)}
-              ${renderItemsTable(room["missing-item"], "Отсутствующие МЦ", room)}
-              ${renderItemsTable(room["wrong-room-item"], " МЦ не из этой комнаты", room)}
-            </div>
-          </div>
-        `,
-          )
+          ?.map((room: InventoryRoom) => {
+            const roomSection = getRoomSection(room);
+            return `
+              <div class="room">
+                <div class="room-header">
+                  <h3>Комната ${room.room_number}</h3>
+                  ${roomSection ? `<span class="room-section-badge">${roomSection}</span>` : ""}
+                </div>
+                <div class="room-section">
+                  ${renderItemsTable(room["correct-item"], "Найденные МЦ", room)}
+                  ${renderItemsTable(room["missing-item"], "Отсутствующие МЦ", room)}
+                  ${renderItemsTable(room["wrong-room-item"], "МЦ не из этой комнаты", room)}
+                </div>
+              </div>
+            `;
+          })
           .join("")}
-
-        
       </div>
     </body>
     </html>

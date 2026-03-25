@@ -1,4 +1,3 @@
-// src/services/reportService.ts
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import {
@@ -8,7 +7,6 @@ import {
 } from "../../types/product.types";
 
 class ReportService {
-  // Основная функция генерации отчета
   generateReport(items: InventoryItem[], options: ReportOptions, filters: any) {
     switch (options.format) {
       case "excel":
@@ -22,13 +20,11 @@ class ReportService {
     }
   }
 
-  // Генерация Excel
   private generateExcel(
     items: InventoryItem[],
     options: ReportOptions,
     filters: any,
   ) {
-    // Подготавливаем данные для Excel
     const data = items.map((item) => ({
       Наименование: item.name,
       Категория: item.inventory_tools_type,
@@ -49,10 +45,8 @@ class ReportService {
         : {}),
     }));
 
-    // Создаем рабочий лист
     const ws = XLSX.utils.json_to_sheet(data);
 
-    // Добавляем информацию о фильтрах
     if (options.showFilters) {
       const filterInfo = [
         ["Фильтры:"],
@@ -73,7 +67,6 @@ class ReportService {
       XLSX.utils.sheet_add_aoa(ws, filterInfo, { origin: -1 });
     }
 
-    // Добавляем дату формирования
     if (options.showDate) {
       XLSX.utils.sheet_add_aoa(
         ws,
@@ -82,11 +75,9 @@ class ReportService {
       );
     }
 
-    // Создаем книгу
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Товары");
 
-    // Генерируем и скачиваем файл
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     const dataBlob = new Blob([excelBuffer], {
       type: "application/octet-stream",
@@ -96,7 +87,6 @@ class ReportService {
     saveAs(dataBlob, fileName);
   }
 
-  // 👇 НОВЫЙ МЕТОД: Генерация HTML для предпросмотра Word
   generateWordHTML(
     items: InventoryItem[],
     options: ReportOptions,
@@ -126,7 +116,6 @@ class ReportService {
         ${options.showDate ? `<p>Дата формирования: ${new Date().toLocaleString("ru-RU")}</p>` : ""}
     `;
 
-    // Добавляем информацию о фильтрах
     if (options.showFilters) {
       htmlContent += `
         <div class="filter-info">
@@ -140,7 +129,6 @@ class ReportService {
       `;
     }
 
-    // Создаем таблицу
     htmlContent += `
       <table>
         <thead>
@@ -179,7 +167,6 @@ class ReportService {
       `;
     });
 
-    // Итоги
     const totalSum = items.reduce((sum, item) => sum + item.price, 0);
     htmlContent += `
         </tbody>
@@ -195,14 +182,12 @@ class ReportService {
     return htmlContent;
   }
 
-  // Метод для скачивания Word из HTML
   downloadWordFromHTML(htmlContent: string, options: ReportOptions) {
     const blob = new Blob([htmlContent], { type: "application/msword" });
     const fileName = `отчет_${options.type === "active" ? "активные" : "списанные"}_${new Date().toISOString().slice(0, 10)}.doc`;
     saveAs(blob, fileName);
   }
 
-  // Генерация Word (для прямого скачивания)
   private generateWord(
     items: InventoryItem[],
     options: ReportOptions,

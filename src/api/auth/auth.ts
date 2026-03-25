@@ -1,65 +1,83 @@
+// api/auth/auth.ts
 import { apiClient } from "./client";
-import { LoginCredentials, LoginResponse } from "../../types/auth.types";
+import { LoginCredentials, LoginResponse, User } from "../../types/auth.types";
 
 console.log("📁 Auth API модуль загружен");
 
+const decodeToken = (token: string): any => {
+  try {
+    const tokenParts = token.split(".");
+    if (tokenParts.length === 3) {
+      const payload = JSON.parse(atob(tokenParts[1]));
+      console.log("🔓 Декодированный payload:", payload);
+      return payload;
+    }
+  } catch (e) {
+    console.error("Ошибка декодирования токена:", e);
+  }
+  return null;
+};
+
+export const getUserFromToken = (token: string): User | null => {
+  const payload = decodeToken(token);
+  if (payload) {
+    return {
+      id: payload.id || payload.user_id || payload.sub,
+      login: payload.login || payload.username || payload.email,
+      role: payload.role || "user",
+      name: payload.name || payload.login || payload.username,
+    };
+  }
+  return null;
+};
+
 export const authApi = {
   login: async (credentials: LoginCredentials) => {
-    console.log("🔐 Попытка входа:", credentials);
+    console.log("🔐 Попытка входа:", credentials.login);
 
     try {
-      console.log("📡 Отправка запроса на /login");
-
       const response = await apiClient.post<LoginResponse>(
-        "/login",
+        "/api/v1/login",
         credentials,
       );
 
       console.log("✅ Успешный ответ от /login:", response.data);
 
-      // Проверяем наличие токена (как в старом коде)
-      if (!response.data.token) {
+      const token = response.data.token || response.data.access_token;
+      if (!token) {
         throw new Error("Токен не получен от сервера");
       }
 
-      // Сохраняем токен
-      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("token", token);
       console.log("🔑 Токен сохранен в localStorage");
 
-      // Декодируем токен для получения роли (как в старом коде)
-      try {
-        const tokenParts = response.data.token.split(".");
-        if (tokenParts.length === 3) {
-          const payload = JSON.parse(atob(tokenParts[1]));
-          const userRole = payload.role || "user";
-          localStorage.setItem("userRole", userRole);
-          console.log("👤 Роль пользователя:", userRole);
+      const user = getUserFromToken(token);
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+        if (user.role) {
+          localStorage.setItem("userRole", user.role);
         }
-      } catch (e) {
-        console.error("Ошибка декодирования токена:", e);
+        console.log("👤 Пользователь из токена:", user);
       }
 
-      return response.data;
+      return {
+        token: token,
+        user: user,
+      };
     } catch (error: any) {
-      // Улучшенная обработка ошибок как в старом коде
       console.error("❌ Ошибка в login API:");
 
       if (error.response) {
-        // Сервер ответил с ошибкой
         console.error("  Статус:", error.response.status);
         console.error("  Данные ошибки:", error.response.data);
-
-        // Извлекаем сообщение об ошибке как в старом коде
         const errorMessage =
           error.response.data?.message ||
           `Ошибка сервера: ${error.response.status}`;
         throw new Error(errorMessage);
       } else if (error.request) {
-        // Запрос был отправлен, но нет ответа
         console.error("  Нет ответа от сервера");
         throw new Error("Сервер не отвечает");
       } else {
-        // Ошибка при настройке запроса
         console.error("  Ошибка:", error.message);
         throw error;
       }
@@ -70,16 +88,14 @@ export const authApi = {
     console.log("🚪 Выход из системы");
     localStorage.removeItem("token");
     localStorage.removeItem("userRole");
+    localStorage.removeItem("user");
   },
 
-  getCurrentUser: async () => {
-    console.log("👤 Запрос текущего пользователя");
-    try {
-      const response = await apiClient.get("/me");
-      return response.data;
-    } catch (error) {
-      console.error("❌ Ошибка получения пользователя:", error);
-      throw error;
+  getCurrentUser: () => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      return getUserFromToken(token);
     }
+    return null;
   },
 };

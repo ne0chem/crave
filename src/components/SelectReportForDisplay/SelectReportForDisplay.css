@@ -1,0 +1,230 @@
+/* components/InventoryReportSelector/SelectReportForDisplay.css */
+.select-report-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.select-report-content {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.select-report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.select-report-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.select-report-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.reports-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.report-item {
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.report-item:hover {
+  background: #f5f5f5;
+}
+
+.report-item.selected {
+  background: #e3f2fd;
+}
+
+.report-item-header {
+  margin-bottom: 12px;
+}
+
+.report-date {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.report-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.stat {
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.stat.total {
+  color: #666;
+}
+
+.stat.correct {
+  color: #4caf50;
+}
+
+.stat.missing {
+  color: #f44336;
+}
+
+.stat.wrong {
+  color: #ff9800;
+}
+
+.report-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.detail-label {
+  font-weight: 500;
+  color: #666;
+  min-width: 70px;
+}
+
+.detail-value {
+  color: #333;
+  flex: 1;
+  word-break: break-word;
+}
+
+.sections-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  flex: 1;
+}
+
+.section-tag {
+  background: #e0e0e0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  color: #666;
+}
+
+.select-report-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.cancel-btn,
+.select-btn {
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-btn {
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  color: #666;
+}
+
+.cancel-btn:hover {
+  background: #e0e0e0;
+}
+
+.select-btn {
+  background: var(--hover-gray);
+  border: none;
+  color: white;
+}
+
+.select-btn:hover:not(:disabled) {
+  background: var(--accent-gray);
+  transform: translateY(-1px);
+}
+
+.select-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.no-reports {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+.no-reports-hint {
+  font-size: 12px;
+  margin-top: 8px;
+  color: #ccc;
+}

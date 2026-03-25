@@ -1,8 +1,6 @@
-// src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { authApi } from "../api/auth/auth";
-import { LoginCredentials, AuthState } from "../types/auth.types";
-import { useDevAuth } from "../useDevAuth"; // 👈 Импортируем хук
+import { authApi, getUserFromToken } from "../api/auth/auth";
+import { LoginCredentials, AuthState, User } from "../types/auth.types";
 
 console.log("📁 AuthContext модуль загружен");
 
@@ -14,109 +12,69 @@ interface AuthContextType extends AuthState {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const devMode = useDevAuth(); // 👈 Используем хук
-
-  // Инициализация состояния с учетом devMode
   const [state, setState] = useState<AuthState>(() => {
-    // Если devMode включен - сразу создаем тестового пользователя
-    if (devMode) {
-      console.log("🧪 DevMode: создаем тестового пользователя");
-      return {
-        user: {
-          id: "dev-user-123",
-          name: "Тестовый Пользователь",
-          login: "dev@test.ru",
-          role: "admin",
-        },
-        token: "dev-token-12345",
-        isLoading: false,
-        error: null,
-      };
+    const token = localStorage.getItem("token");
+    const savedUser = localStorage.getItem("user");
+
+    let user: User | null = null;
+
+    if (savedUser) {
+      try {
+        user = JSON.parse(savedUser);
+        console.log("📦 Загружен пользователь из localStorage:", user);
+      } catch (e) {
+        console.error("Ошибка парсинга пользователя:", e);
+      }
+    } else if (token) {
+      user = getUserFromToken(token);
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+        console.log("🔓 Пользователь декодирован из токена:", user);
+      }
     }
 
-    // Обычный режим - берем из localStorage
     return {
-      user: null,
-      token: localStorage.getItem("token"),
-      isLoading: true,
+      user: user,
+      token: token,
+      isLoading: false,
       error: null,
     };
   });
 
   console.log("📊 Начальное состояние:", {
     token: state.token ? "есть" : "нет",
+    user: state.user ? state.user.login : "нет",
+    role: state.user?.role || "нет",
     isLoading: state.isLoading,
-    devMode: devMode,
   });
-
-  // Проверка авторизации только для обычного режима
-  useEffect(() => {
-    // В devMode ничего не проверяем
-    if (devMode) {
-      console.log("🧪 DevMode: пропускаем проверку авторизации");
-      return;
-    }
-
-    console.log("🔄 useEffect: проверка авторизации");
-
-    const checkAuth = async () => {
-      console.log("🔍 checkAuth вызван, токен:", state.token ? "есть" : "нет");
-
-      if (state.token) {
-        try {
-          console.log("👤 Запрос данных пользователя по токену");
-          const user = await authApi.getCurrentUser();
-          console.log("✅ Пользователь загружен:", user);
-          setState((prev) => ({ ...prev, user, isLoading: false }));
-        } catch (error) {
-          console.error("❌ Ошибка проверки токена:", error);
-          localStorage.removeItem("token");
-          setState({ user: null, token: null, isLoading: false, error: null });
-        }
-      } else {
-        console.log("⏭️ Нет токена, пропускаем проверку");
-        setState((prev) => ({ ...prev, isLoading: false }));
-      }
-    };
-
-    checkAuth();
-  }, [state.token, devMode]); // 👈 Добавили devMode в зависимости
 
   const login = async (credentials: LoginCredentials) => {
     console.log("🔐 login вызван");
 
-    // В devMode имитируем успешный вход
-    if (devMode) {
-      console.log("🧪 DevMode: имитация входа");
-      setState({
-        user: {
-          id: "dev-user-123",
-          name: "Тестовый Пользователь",
-          login: credentials.login,
-          role: "admin",
-        },
-        token: "dev-token-12345",
-        isLoading: false,
-        error: null,
-      });
-      return;
-    }
-
-    // Обычный режим - реальный API
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
       const response = await authApi.login(credentials);
-      localStorage.setItem("token", response.token);
+      console.log("📦 Ответ от authApi.login:", response);
+
+      if (!response.token) {
+        throw new Error("Токен не получен");
+      }
+
       setState({
         user: response.user,
         token: response.token,
         isLoading: false,
         error: null,
       });
+
+      console.log(
+        "✅ Состояние обновлено, пользователь авторизован:",
+        response.user,
+      );
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || error.message || "Ошибка входа";
+      const errorMessage = error.message || "Ошибка входа";
+      console.error("❌ Ошибка входа:", errorMessage);
       setState((prev) => ({
         ...prev,
         isLoading: false,
@@ -129,23 +87,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = () => {
     console.log("🚪 logout вызван");
 
-    // В devMode просто очищаем состояние
-    if (devMode) {
-      setState({ user: null, token: null, isLoading: false, error: null });
-      return;
-    }
+    localStorage.removeItem("token");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("user");
 
-    // Обычный режим - вызываем API и очищаем
     authApi.logout();
+
     setState({ user: null, token: null, isLoading: false, error: null });
+
+    console.log("✅ Выход выполнен");
   };
 
   console.log("🔄 Рендер AuthProvider, состояние:", {
     hasUser: !!state.user,
+    userLogin: state.user?.login,
+    userRole: state.user?.role,
     hasToken: !!state.token,
     isLoading: state.isLoading,
     hasError: !!state.error,
-    devMode: devMode,
   });
 
   return (

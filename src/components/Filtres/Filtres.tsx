@@ -1,12 +1,12 @@
-// components/Filtres/Filtres.tsx
 import { useProductFilters } from "../../hooks/useProductFilters";
 import "./Filtres.css";
 
 interface FiltersProps {
-  filters: ReturnType<typeof useProductFilters>; // 👈 Берем тип из хука
+  filters: ReturnType<typeof useProductFilters>;
+  rooms?: string[];
 }
 
-export default function Filtres({ filters }: FiltersProps) {
+export default function Filtres({ filters, rooms = [] }: FiltersProps) {
   const {
     openFilter,
     sortType,
@@ -29,6 +29,8 @@ export default function Filtres({ filters }: FiltersProps) {
     toggleFilter,
     resetFilters,
   } = filters;
+
+  const displayRooms = rooms.length > 0 ? rooms : uniqueRooms;
 
   return (
     <div className="poik__container">
@@ -239,7 +241,7 @@ export default function Filtres({ filters }: FiltersProps) {
                 onChange={(e) => setSearchRoom(e.target.value)}
               />
               <div className="filter-list">
-                {uniqueRooms
+                {displayRooms
                   .filter((room) =>
                     room.toLowerCase().includes(searchRoom.toLowerCase()),
                   )

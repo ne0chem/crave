@@ -1,15 +1,9 @@
-// hooks/useInventoryReport.ts
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { inventoryApi } from "../api/inventory/inventory.api";
 import {
   InventoryReport,
-  NestedInventoryReport,
-  InventoryRoom,
   RoomInventoryStatus,
-  RoomInventoryDetails, // 👈 ЭТОТ ИМПОРТ ВАЖЕН!
-  CorrectItem,
-  MissingItem,
-  WrongRoomItem,
+  RoomInventoryDetails,
 } from "../types/inventory.types";
 
 export const useInventoryReport = () => {
@@ -20,157 +14,243 @@ export const useInventoryReport = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Загрузка всех отчетов
-  const loadReports = async () => {
+  const loadReports = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const data = await inventoryApi.getReports();
       setReports(data);
-      // Автоматически выбираем последний отчет
-      if (data.length > 0) {
-        setSelectedReport(data[0]);
-      }
-    } catch (err) {
-      setError("Ошибка загрузки отчетов");
-      console.error(err);
+    } catch (err: any) {
+      setError(err.message || "Ошибка загрузки отчетов");
+      console.error("Ошибка загрузки отчетов:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  // Загрузка конкретного отчета
-  const loadReportById = async (reportId: string) => {
-    setLoading(true);
-    try {
-      const report = await inventoryApi.getReportById(reportId);
-      setSelectedReport(report);
-    } catch (err) {
-      setError("Ошибка загрузки отчета");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Получение статуса для конкретной комнаты
-  const getRoomStatus = (roomId: string): RoomInventoryStatus | null => {
-    if (!selectedReport) return null;
-
-    // Ищем комнату в основном массиве rooms
-    const room = selectedReport.rooms?.find((r) => r.room_id === roomId);
-
-    if (!room) {
-      // Ищем в wrong-room-item (там могут быть вложенные отчеты)
-      const nestedReports = selectedReport[
-        "wrong-room-item"
-      ] as NestedInventoryReport[];
-
-      for (const nestedReport of nestedReports) {
-        const foundRoom = nestedReport.rooms?.find((r) => r.room_id === roomId);
-        if (foundRoom) {
-          return calculateRoomStatus(foundRoom, roomId);
+  const loadReportById = useCallback(
+    async (reportId: string) => {
+      console.log("🔍 loadReportById вызван с ID:", reportId);
+      setLoading(true);
+      setError(null);
+      try {
+        const existingReport = reports.find((r) => r.report_id === reportId);
+        if (existingReport) {
+          console.log("✅ Отчет найден в кэше:", existingReport);
+          setSelectedReport(existingReport);
+          setLoading(false);
+          return;
         }
+
+        const data = await inventoryApi.getReportById(reportId);
+        console.log("✅ Отчет получен с сервера:", data);
+        setSelectedReport(data);
+      } catch (err: any) {
+        console.error("❌ Ошибка загрузки отчета:", err);
+        setError(err.message || "Ошибка загрузки отчета");
+      } finally {
+        setLoading(false);
       }
-      return null;
-    }
+    },
+    [reports],
+  );
 
-    return calculateRoomStatus(room, roomId);
-  };
+  const getRoomStatus = useCallback(
+    (roomId: string): RoomInventoryStatus | null => {
+      console.log("🔍 getRoomStatus вызван для roomId:", roomId);
+      console.log("📊 selectedReport:", selectedReport?.report_id);
+      console.log(
+        "📊 Комнаты в отчете:",
+        selectedReport?.rooms?.map((r) => ({
+          id: r.room_id,
+          name: r.room_name,
+        })),
+      );
 
-  // Вспомогательная функция для расчета статуса комнаты
-  const calculateRoomStatus = (
-    room: InventoryRoom,
-    roomId: string,
-  ): RoomInventoryStatus => {
-    const correct = room["correct-item"] || [];
-    const missing = room["missing-item"] || [];
-    const wrong = room["wrong-room-item"] || [];
+      if (!selectedReport?.rooms) {
+        console.log("⚠️ Нет отчета или комнат");
+        return null;
+      }
 
-    const correctCount = correct.length;
-    const missingCount = missing.length;
-    const wrongCount = wrong.length;
-    const totalItems = correctCount + missingCount + wrongCount;
+      const roomData = selectedReport.rooms.find((r) => r.room_id === roomId);
 
-    const correctPrice = correct.reduce(
-      (sum: number, item: CorrectItem) => sum + (item.price || 0),
-      0,
-    );
-    const missingPrice = missing.reduce(
-      (sum: number, item: MissingItem) => sum + (item.price || 0),
-      0,
-    );
-    const wrongPrice = wrong.reduce(
-      (sum: number, item: WrongRoomItem) => sum + (item.price || 0),
-      0,
-    );
+      if (!roomData) {
+        console.log(`❌ Комната с ID ${roomId} не найдена в отчете`);
+        console.log(
+          "Доступные ID:",
+          selectedReport.rooms.map((r) => r.room_id),
+        );
+        return null;
+      }
 
-    // Определяем статус
-    let status: "success" | "warning" | "danger" | "pending" = "success";
-    const hasMissing = missingCount > 0;
-    const hasWrong = wrongCount > 0;
-    const hasIssues = hasMissing || hasWrong;
+      console.log(`✅ Найдена комната: ${roomData.room_name}`, roomData);
 
-    if (hasIssues) {
-      if (missingCount > 0 && wrongCount > 0) status = "danger";
-      else if (missingCount > 0) status = "danger";
-      else if (wrongCount > 0) status = "warning";
-    }
+      const correctItems = roomData["correct-item"] || [];
+      const missingItems = roomData["missing-item"] || [];
+      const wrongItems = roomData["wrong-room-item"] || [];
 
-    return {
-      roomId,
-      roomNumber: room.room_number,
-      roomName: room.room_name,
-      status,
-      correctCount,
-      missingCount,
-      wrongCount,
-      totalItems,
-      correctPrice,
-      missingPrice,
-      wrongPrice,
-      totalPrice: correctPrice + missingPrice + wrongPrice,
-      hasIssues,
-      hasMissing,
-      hasWrong,
-    };
-  };
+      const correctCount = correctItems.length;
+      const missingCount = missingItems.length;
+      const wrongCount = wrongItems.length;
 
-  // Получение деталей комнаты
-  const getRoomDetails = (roomId: string): RoomInventoryDetails | null => {
-    if (!selectedReport) return null;
+      const correctPrice = correctItems.reduce(
+        (sum, item) => sum + (item.price || 0),
+        0,
+      );
+      const missingPrice = missingItems.reduce(
+        (sum, item) => sum + (item.price || 0),
+        0,
+      );
+      const wrongPrice = wrongItems.reduce(
+        (sum, item) => sum + (item.price || 0),
+        0,
+      );
 
-    // Ищем в основном массиве rooms
-    const room = selectedReport.rooms?.find((r) => r.room_id === roomId);
+      let status: "success" | "warning" | "danger" = "success";
+      if (missingCount > 0 || wrongCount > 0) {
+        status = missingCount > 0 ? "danger" : "warning";
+      }
 
-    if (room) {
       return {
-        correct: room["correct-item"] || [],
-        missing: room["missing-item"] || [],
-        wrong: room["wrong-room-item"] || [],
+        status,
+        correctCount,
+        missingCount,
+        wrongCount,
+        correctPrice,
+        missingPrice,
+        wrongPrice,
+        totalPrice: correctPrice + missingPrice + wrongPrice,
+        hasMissing: missingCount > 0,
+        hasWrong: wrongCount > 0,
+      };
+    },
+    [selectedReport],
+  );
+
+  const getRoomDetails = useCallback(
+    (roomId: string): RoomInventoryDetails | null => {
+      if (!selectedReport?.rooms) return null;
+
+      const roomData = selectedReport.rooms.find((r) => r.room_id === roomId);
+
+      if (!roomData) return null;
+
+      const correct = (roomData["correct-item"] || []).map((item) => ({
+        id: item.id,
+        name: item.name,
+        inventory_tools_type: item.inventory_tools_type,
+        description: item.description,
+        inv_number: item.inv_number,
+        price: item.price,
+        rfid: item.rfid,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        room_name: roomData.room_name,
+        room_number: roomData.room_number,
+      }));
+
+      const missing = (roomData["missing-item"] || []).map((item) => ({
+        id: item.id,
+        name: item.name,
+        inventory_tools_type: item.inventory_tools_type,
+        description: item.description,
+        inv_number: item.inv_number,
+        price: item.price,
+        rfid: item.rfid,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        expectedRoom: item.expected_room || roomData.room_number,
+        currentLocation: item.current_location || "Не найдено",
+      }));
+
+      const wrong = (roomData["wrong-room-item"] || []).map((item) => ({
+        id: item.id,
+        name: item.name,
+        inventory_tools_type: item.inventory_tools_type,
+        description: item.description,
+        inv_number: item.inv_number,
+        price: item.price,
+        rfid: item.rfid,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        expectedRoom: item.room_number || "?",
+        currentRoom: roomData.room_number,
+      }));
+
+      return {
+        correct,
+        missing,
+        wrong,
+      };
+    },
+    [selectedReport],
+  );
+
+  const getReportRooms = useCallback(() => {
+    if (!selectedReport?.rooms) return [];
+    return selectedReport.rooms.map((room) => ({
+      id: room.room_id,
+      name: room.room_name,
+      number: room.room_number,
+      section: room.section,
+    }));
+  }, [selectedReport]);
+
+  const getReportStats = useCallback(() => {
+    if (!selectedReport?.rooms) {
+      return {
+        totalCorrect: 0,
+        totalMissing: 0,
+        totalWrong: 0,
+        totalCorrectPrice: 0,
+        totalMissingPrice: 0,
+        totalWrongPrice: 0,
       };
     }
 
-    // Ищем во вложенных отчетах
-    const nestedReports = selectedReport[
-      "wrong-room-item"
-    ] as NestedInventoryReport[];
-    for (const nestedReport of nestedReports) {
-      const foundRoom = nestedReport.rooms?.find((r) => r.room_id === roomId);
-      if (foundRoom) {
-        return {
-          correct: foundRoom["correct-item"] || [],
-          missing: foundRoom["missing-item"] || [],
-          wrong: foundRoom["wrong-room-item"] || [],
-        };
-      }
-    }
+    let totalCorrect = 0;
+    let totalMissing = 0;
+    let totalWrong = 0;
+    let totalCorrectPrice = 0;
+    let totalMissingPrice = 0;
+    let totalWrongPrice = 0;
 
-    return null;
-  };
+    selectedReport.rooms.forEach((room) => {
+      const correctItems = room["correct-item"] || [];
+      const missingItems = room["missing-item"] || [];
+      const wrongItems = room["wrong-room-item"] || [];
+
+      totalCorrect += correctItems.length;
+      totalMissing += missingItems.length;
+      totalWrong += wrongItems.length;
+
+      totalCorrectPrice += correctItems.reduce(
+        (sum, item) => sum + (item.price || 0),
+        0,
+      );
+      totalMissingPrice += missingItems.reduce(
+        (sum, item) => sum + (item.price || 0),
+        0,
+      );
+      totalWrongPrice += wrongItems.reduce(
+        (sum, item) => sum + (item.price || 0),
+        0,
+      );
+    });
+
+    return {
+      totalCorrect,
+      totalMissing,
+      totalWrong,
+      totalCorrectPrice,
+      totalMissingPrice,
+      totalWrongPrice,
+    };
+  }, [selectedReport]);
 
   useEffect(() => {
     loadReports();
-  }, []);
+  }, [loadReports]);
 
   return {
     reports,
@@ -181,5 +261,7 @@ export const useInventoryReport = () => {
     loadReportById,
     getRoomStatus,
     getRoomDetails,
+    getReportRooms,
+    getReportStats,
   };
 };

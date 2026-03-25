@@ -1,4 +1,3 @@
-/* вся логика фильтрации */
 import { useState, useMemo } from "react";
 import {
   InventoryItem,
@@ -13,7 +12,10 @@ interface FiltersState {
   section: string;
 }
 
-export const useProductFilters = (items: InventoryItem[]) => {
+export const useProductFilters = (
+  items: InventoryItem[],
+  allRooms?: string[],
+) => {
   const [openFilter, setOpenFilter] = useState<string | null>(null);
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [sortType, setSortType] = useState<string | null>(null);
@@ -29,73 +31,69 @@ export const useProductFilters = (items: InventoryItem[]) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchSection, setSearchSection] = useState("");
 
-  // Уникальные значения для фильтров (только из активных товаров)
   const uniqueSections = useMemo(() => {
-    // Берем только активные товары (Product) для секций
     const activeItems = items.filter(
       (item): item is Product => !isDisposal(item),
     );
-    return [...new Set(activeItems.map((p) => p.section))].filter(Boolean);
+    const sections = new Set<string>();
+    activeItems.forEach((item) => {
+      if (item.section && item.section !== "Без секции") {
+        sections.add(item.section);
+      }
+    });
+    return Array.from(sections).sort();
   }, [items]);
 
   const uniqueCategories = useMemo(() => {
-    // Категории есть и у активных, и у списанных
     return [...new Set(items.map((item) => item.inventory_tools_type))].filter(
       Boolean,
     );
   }, [items]);
 
   const uniqueRooms = useMemo(() => {
-    // Комнаты есть и у активных, и у списанных
+    if (allRooms && allRooms.length > 0) {
+      return allRooms;
+    }
     return [...new Set(items.map((item) => item.room_name || ""))].filter(
       Boolean,
     );
-  }, [items]);
+  }, [items, allRooms]);
 
-  // Фильтрация товаров
   const filteredProducts = useMemo(() => {
     if (!items) return [];
 
     let result = [...items];
 
-    // Поиск по названию
     if (searchQuery) {
       result = result.filter((item) =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
 
-    // Фильтр по секции (из правого меню) - ТОЛЬКО для активных товаров
     if (selectedFilters.section) {
       result = result.filter((item) => {
-        // Для списанных игнорируем фильтр по секции или показываем все
         if (isDisposal(item)) return true;
         return (item as Product).section === selectedFilters.section;
       });
     }
 
-    // Фильтр по секции из левого меню - ТОЛЬКО для активных товаров
     if (selectedSection) {
       result = result.filter((item) => {
-        // Для списанных игнорируем фильтр по секции или показываем все
         if (isDisposal(item)) return true;
         return (item as Product).section === selectedSection;
       });
     }
 
-    // Фильтр по категории (работает для всех)
     if (selectedFilters.category) {
       result = result.filter(
         (item) => item.inventory_tools_type === selectedFilters.category,
       );
     }
 
-    // Фильтр по помещению (работает для всех)
     if (selectedFilters.room) {
       result = result.filter((item) => item.room_name === selectedFilters.room);
     }
 
-    // Фильтр по цене (работает для всех)
     if (priceFrom !== "") {
       result = result.filter((item) => item.price >= Number(priceFrom));
     }
@@ -103,7 +101,6 @@ export const useProductFilters = (items: InventoryItem[]) => {
       result = result.filter((item) => item.price <= Number(priceTo));
     }
 
-    // Поиск по категории (работает для всех)
     if (searchCategory) {
       result = result.filter((item) =>
         item.inventory_tools_type
@@ -112,14 +109,12 @@ export const useProductFilters = (items: InventoryItem[]) => {
       );
     }
 
-    // Поиск по помещению (работает для всех)
     if (searchRoom) {
       result = result.filter((item) =>
         item.room_name?.toLowerCase().includes(searchRoom.toLowerCase()),
       );
     }
 
-    // Сортировка (работает для всех)
     if (sortType === "name-asc") {
       result.sort((a, b) => a.name.localeCompare(b.name));
     } else if (sortType === "name-desc") {
@@ -143,7 +138,6 @@ export const useProductFilters = (items: InventoryItem[]) => {
     searchQuery,
   ]);
 
-  // Сброс всех фильтров
   const resetFilters = () => {
     setSelectedSection(null);
     setSortType(null);
@@ -162,7 +156,6 @@ export const useProductFilters = (items: InventoryItem[]) => {
   };
 
   return {
-    // Состояния
     openFilter,
     selectedSection,
     sortType,
@@ -174,15 +167,12 @@ export const useProductFilters = (items: InventoryItem[]) => {
     searchQuery,
     searchSection,
 
-    // Уникальные значения
     uniqueSections,
     uniqueCategories,
     uniqueRooms,
 
-    // Результат фильтрации
     filteredProducts,
 
-    // Функции для обновления
     setSelectedSection,
     setSortType,
     setPriceFrom,

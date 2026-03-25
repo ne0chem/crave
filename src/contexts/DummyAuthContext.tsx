@@ -1,6 +1,5 @@
 import React, { createContext, useContext } from "react";
 
-// Заглушка для пользователя
 const DummyAuthContext = createContext({
   user: { id: "1", name: "Dev User", role: "admin" },
   isLoading: false,

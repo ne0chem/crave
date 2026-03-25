@@ -1,4 +1,3 @@
-// src/components/Modal/SearchModal/SearchModal.tsx
 import React, { useState } from "react";
 import { useProducts } from "../../../contexts/ProductsContext";
 import { useProductFilters } from "../../../hooks/useProductFilters";
@@ -21,7 +20,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
   const [showWrittenOff, setShowWrittenOff] = useState(false);
   const [openProductId, setOpenProductId] = useState<string | null>(null);
 
-  // Состояния для отчетов
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [previewContent, setPreviewContent] = useState("");
@@ -106,7 +104,6 @@ const SearchModal: React.FC<SearchModalProps> = ({ isOpen, onClose }) => {
     setIsPreviewOpen(true);
   };
 
-  // Обработчик скачивания из предпросмотра
   const handleDownloadFromPreview = () => {
     const options: ReportOptions = {
       format: "word",

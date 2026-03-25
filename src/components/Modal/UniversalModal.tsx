@@ -25,9 +25,9 @@ interface UniversalModalProps {
   itemData?: any;
   rooms?: Room[];
   categories?: string[];
-  onSave?: (data: Partial<FormData>) => void;
+  onSave?: (data: Partial<FormData>) => any;
   onConfirm?: () => void;
-  onSubmit?: (data: Partial<FormData>) => void;
+  onSubmit?: (data: Partial<FormData>) => any;
 }
 
 const UniversalModal: React.FC<UniversalModalProps> = ({
@@ -57,15 +57,31 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
 
   const [isEditMode, setIsEditMode] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (itemData) {
+      console.log("📦 UniversalModal получил itemData:", itemData);
+
       setFormData((prev) => ({
         ...prev,
-        ...itemData,
+        name: itemData.name || "",
+        category: itemData.category || itemData.inventory_tools_type || "",
+        roomId: itemData.room_id || itemData.roomId || "",
+        price: itemData.price?.toString() || "",
+        inventNumber: itemData.inventNumber || itemData.inv_number || "",
+        info: itemData.info || itemData.description || "",
+        actionDate: itemData.actionDate || "",
+        actionReason: itemData.actionReason || "",
+        actionPerson: itemData.actionPerson || "",
       }));
     }
   }, [itemData]);
+
+  useEffect(() => {
+    setIsEditMode(false);
+    setIsSubmitting(false);
+  }, [type, itemData]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -74,7 +90,6 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Очищаем ошибку для этого поля при изменении
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -96,25 +111,68 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isSubmitting) return;
+
+    console.log("📤 Отправка формы:", { type, formData });
 
     if (type === modalTypes.ACTION && !validateForm()) {
       return;
     }
 
-    if (type === modalTypes.CONFIRM) {
-      onConfirm?.();
-    } else if (type === modalTypes.ACTION) {
-      onSubmit?.(formData);
-    } else {
-      onSave?.(formData);
+    setIsSubmitting(true);
+
+    try {
+      if (type === modalTypes.ACTION) {
+        const writeoffData = {
+          productId: itemData?.id,
+          description: formData.info || itemData?.description || "",
+          written_off_by: formData.actionPerson,
+
+          reason: formData.actionReason,
+          date: formData.actionDate,
+        };
+
+        console.log("📤 Данные для списания:", writeoffData);
+        await (onSubmit as any)?.(writeoffData);
+        onClose();
+      } else {
+        const saveData: any = {
+          name: formData.name,
+          category: formData.category,
+          roomId: formData.roomId,
+          price: formData.price,
+          inventNumber: formData.inventNumber,
+          info: formData.info,
+        };
+
+        if (itemData?.room_id) {
+          saveData.room_id = formData.roomId;
+        }
+
+        console.log("📤 Данные для сохранения:", saveData);
+        onSave?.(saveData);
+        onClose();
+      }
+    } catch (error) {
+      console.error("❌ Ошибка при отправке формы:", error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const getRoomDisplayName = (room: Room): string => {
-    return `${room.name} ${room.number} (${room.building}, ${room.floor} этаж)`;
+    return `${room.name} (№${room.number}) - ${room.building}, ${room.floor} этаж`;
   };
+
+  const selectedRoom = rooms.find((room) => room.id === formData.roomId);
+  const selectedRoomDisplay = selectedRoom
+    ? getRoomDisplayName(selectedRoom)
+    : formData.roomId
+      ? "Выберите помещение"
+      : "";
 
   const renderItemForm = () => (
     <form className="form__style" onSubmit={handleSubmit}>
@@ -128,6 +186,7 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
           onChange={handleInputChange}
           readOnly={type === modalTypes.ITEM_VIEW && !isEditMode}
           placeholder="Введите наименование"
+          disabled={isSubmitting}
         />
         {errors.name && <span className="error-message">{errors.name}</span>}
       </div>
@@ -139,7 +198,9 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
           name="category"
           value={formData.category}
           onChange={handleInputChange}
-          disabled={type === modalTypes.ITEM_VIEW && !isEditMode}
+          disabled={
+            (type === modalTypes.ITEM_VIEW && !isEditMode) || isSubmitting
+          }
         >
           <option value="">Выберите категорию</option>
           {categories.map((cat) => (
@@ -152,20 +213,31 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
 
       <div className="form__input">
         <label className="label__text">Местоположение:</label>
-        <select
-          className={`input__text ${errors.roomId ? "error" : ""}`}
-          name="roomId"
-          value={formData.roomId}
-          onChange={handleInputChange}
-          disabled={type === modalTypes.ITEM_VIEW && !isEditMode}
-        >
-          <option value="">Выберите помещение</option>
-          {rooms.map((room) => (
-            <option key={room.id} value={room.id}>
-              {getRoomDisplayName(room)}
-            </option>
-          ))}
-        </select>
+        {type === modalTypes.ITEM_VIEW && !isEditMode ? (
+          <div className="input__text readonly">
+            {selectedRoomDisplay || formData.roomId || "Не указано"}
+          </div>
+        ) : (
+          <select
+            className={`input__text ${errors.roomId ? "error" : ""}`}
+            name="roomId"
+            value={formData.roomId}
+            onChange={handleInputChange}
+            disabled={
+              (type === modalTypes.ITEM_VIEW && !isEditMode) || isSubmitting
+            }
+          >
+            <option value="">Выберите помещение</option>
+            {rooms.map((room) => (
+              <option key={room.id} value={room.id}>
+                {getRoomDisplayName(room)}
+              </option>
+            ))}
+          </select>
+        )}
+        {errors.roomId && (
+          <span className="error-message">{errors.roomId}</span>
+        )}
       </div>
 
       <div className="form__input">
@@ -178,6 +250,7 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
           onChange={handleInputChange}
           readOnly={type === modalTypes.ITEM_VIEW && !isEditMode}
           placeholder="Введите стоимость"
+          disabled={isSubmitting}
         />
       </div>
 
@@ -191,6 +264,7 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
           onChange={handleInputChange}
           readOnly={type === modalTypes.ITEM_VIEW && !isEditMode}
           placeholder="Введите инвентаризационный номер"
+          disabled={isSubmitting}
         />
       </div>
 
@@ -204,6 +278,7 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
           readOnly={type === modalTypes.ITEM_VIEW && !isEditMode}
           placeholder="Введите описание"
           rows={3}
+          disabled={isSubmitting}
         />
       </div>
 
@@ -214,18 +289,24 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
               type="button"
               className="button__modal secondary"
               onClick={() => setIsEditMode(true)}
+              disabled={isSubmitting}
             >
               Редактировать
             </button>
           ) : (
             <>
-              <button type="submit" className="button__modal">
-                Сохранить
+              <button
+                type="submit"
+                className="button__modal"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Сохранение..." : "Сохранить"}
               </button>
               <button
                 type="button"
                 className="button__modal secondary"
                 onClick={() => setIsEditMode(false)}
+                disabled={isSubmitting}
               >
                 Отменить
               </button>
@@ -236,13 +317,24 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
 
       {(type === modalTypes.ITEM_EDIT || type === modalTypes.ITEM_ADD) && (
         <div className="button__container">
-          <button className="button__modal" type="submit">
-            {type === modalTypes.ITEM_ADD ? "Добавить" : "Сохранить"}
+          <button
+            className="button__modal"
+            type="submit"
+            disabled={isSubmitting}
+          >
+            {isSubmitting
+              ? type === modalTypes.ITEM_ADD
+                ? "Добавление..."
+                : "Сохранение..."
+              : type === modalTypes.ITEM_ADD
+                ? "Добавить"
+                : "Сохранить"}
           </button>
           <button
             className="button__modal secondary"
             type="button"
             onClick={onClose}
+            disabled={isSubmitting}
           >
             Отмена
           </button>
@@ -253,32 +345,6 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
 
   const renderActionForm = () => (
     <form className="form__style" onSubmit={handleSubmit}>
-      {/* <div className="form__input">
-        <label className="label__text">Действие:</label>
-        <div className="radio-group">
-          <label>
-            <input
-              type="radio"
-              name="actionType"
-              value="writeoff"
-              checked={formData.actionType === "writeoff"}
-              onChange={handleInputChange}
-            />
-            Списать
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="actionType"
-              value="transfer"
-              checked={formData.actionType === "transfer"}
-              onChange={handleInputChange}
-            />
-            Переместить
-          </label>
-        </div>
-      </div> */}
-
       <div className="form__input">
         <label className="label__text">Наименование МЦ:</label>
         <input
@@ -287,9 +353,23 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
           name="name"
           value={formData.name}
           onChange={handleInputChange}
-          placeholder="Введите наименование МЦ"
+          readOnly
+          disabled={isSubmitting}
         />
         {errors.name && <span className="error-message">{errors.name}</span>}
+      </div>
+
+      <div className="form__input">
+        <label className="label__text">Описание:</label>
+        <textarea
+          className={`input__text ${errors.info ? "error" : ""}`}
+          name="info"
+          value={formData.info}
+          onChange={handleInputChange}
+          placeholder="Введите описание (необязательно)"
+          rows={3}
+          disabled={isSubmitting}
+        />
       </div>
 
       <div className="form__input">
@@ -300,6 +380,7 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
           name="actionDate"
           value={formData.actionDate}
           onChange={handleInputChange}
+          disabled={isSubmitting}
         />
         {errors.actionDate && (
           <span className="error-message">{errors.actionDate}</span>
@@ -315,6 +396,7 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
           onChange={handleInputChange}
           rows={4}
           placeholder="Опишите причину списания"
+          disabled={isSubmitting}
         />
         {errors.actionReason && (
           <span className="error-message">{errors.actionReason}</span>
@@ -330,6 +412,7 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
           value={formData.actionPerson}
           onChange={handleInputChange}
           placeholder="Введите ФИО ответственного лица"
+          disabled={isSubmitting}
         />
         {errors.actionPerson && (
           <span className="error-message">{errors.actionPerson}</span>
@@ -337,32 +420,19 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
       </div>
 
       <div className="button__container">
-        <button type="submit" className="button__modal">
-          Подтвердить списание
+        <button type="submit" className="button__modal" disabled={isSubmitting}>
+          {isSubmitting ? "Списание..." : "Подтвердить списание"}
         </button>
         <button
           type="button"
           className="button__modal secondary"
           onClick={onClose}
+          disabled={isSubmitting}
         >
           Отмена
         </button>
       </div>
     </form>
-  );
-
-  const renderConfirmForm = () => (
-    <div className="confirm-content">
-      <p>{formData.confirmMessage || "Вы уверены, что хотите списать МЦ?"}</p>
-      <div className="button__container">
-        <button className="button__modal" onClick={onConfirm}>
-          Да, списать
-        </button>
-        <button className="button__modal secondary" onClick={onClose}>
-          Отмена
-        </button>
-      </div>
-    </div>
   );
 
   const renderContent = () => {
@@ -373,8 +443,6 @@ const UniversalModal: React.FC<UniversalModalProps> = ({
         return renderItemForm();
       case modalTypes.ACTION:
         return renderActionForm();
-      case modalTypes.CONFIRM:
-        return renderConfirmForm();
       default:
         return null;
     }

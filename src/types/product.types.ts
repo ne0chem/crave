@@ -1,5 +1,3 @@
-// ================ БАЗОВЫЙ ТИП ================
-// Общие поля для всех товаров
 interface BaseInventoryItem {
   id: string;
   name: string;
@@ -12,40 +10,36 @@ interface BaseInventoryItem {
   attributes: string | null;
   created_at: string;
   updated_at: string;
+  room_id?: string;
 }
 
-// ================ АКТИВНЫЕ ТОВАРЫ ================
 export interface Product extends BaseInventoryItem {
-  // Специфические поля для активных товаров
   building: string;
   room_name: string;
   room_number: string;
-  section: string;
-  roomInfo: {
+  section?: string;
+  roomInfo?: {
     id: string;
     number: string;
     name: string;
     floor: number;
   };
-  // У активных товаров нет deleted_at
 }
 
-// ================ СПИСАННЫЕ ТОВАРЫ ================
 export interface Disposal extends BaseInventoryItem {
-  // Специфические поля для списанных
-  room_number: number; // может быть число
-  room_name?: string; // опционально для совместимости
+  room_number: number | string;
+  room_name?: string;
+  section?: string;
   written_off_by: string;
-  reason?: string; // причина списания
-  deleted_at: string; // обязательное поле - дата списания
-  // Обновляем updated_at - он может быть строкой
+  reason?: string;
+  deleted_at: string;
   updated_at: string;
+  building: string;
+  floor_number: number;
 }
 
-// ================ ОБЪЕДИНЕННЫЕ ТИПЫ ================
 export type InventoryItem = Product | Disposal;
 
-// Type guards для проверки типа
 export function isDisposal(item: InventoryItem): item is Disposal {
   return (
     "deleted_at" in item &&
@@ -58,10 +52,9 @@ export function isProduct(item: InventoryItem): item is Product {
   return !("deleted_at" in item);
 }
 
-// ================ ОТВЕТЫ ОТ API ================
 export interface ProductsResponse {
   items: Product[];
-  total?: number; // опционально, если API возвращает общее количество
+  total?: number;
   page?: number;
   limit?: number;
 }
@@ -73,10 +66,8 @@ export interface DisposalResponse {
   limit?: number;
 }
 
-// Объединенный тип ответа
 export type InventoryResponse = ProductsResponse | DisposalResponse;
 
-// ================ ФИЛЬТРЫ ================
 export interface ProductFilters {
   category?: string;
   search?: string;
@@ -86,20 +77,18 @@ export interface ProductFilters {
   sortOrder?: "asc" | "desc";
   sortByName?: "asc" | "desc";
   sortByPrice?: "asc" | "desc";
-  section?: string; // фильтр по секции
-  room?: string; // фильтр по комнате
-  dateFrom?: string; // фильтр по дате
+  section?: string;
+  room?: string;
+  dateFrom?: string;
   dateTo?: string;
 }
 
-// Фильтры для списанных товаров
 export interface DisposalFilters extends ProductFilters {
-  writtenOffBy?: string; // кто списал
-  dateFrom?: string; // дата списания с
-  dateTo?: string; // дата списания по
+  writtenOffBy?: string;
+  dateFrom?: string;
+  dateTo?: string;
 }
 
-// ================ СОЗДАНИЕ/ОБНОВЛЕНИЕ ================
 export interface CreateProductData {
   name: string;
   inventory_tools_type: string;
@@ -114,8 +103,9 @@ export interface CreateProductData {
   room_name: string;
   room_number: string;
   updated_at: string | null;
-  section: string;
-  roomInfo: {
+  section?: string;
+  room_id?: string;
+  roomInfo?: {
     id: string;
     number: string;
     name: string;
@@ -123,20 +113,19 @@ export interface CreateProductData {
   };
 }
 
-// Данные для списания
 export interface WriteoffData {
   productId: string;
   reason: string;
   date: string;
   person: string;
+  description?: string;
+  written_off_by?: string;
 }
 
-// Обновление товара (Partial значит все поля опциональные)
 export interface UpdateProductData extends Partial<CreateProductData> {
-  id: string; // id обязателен
+  id: string;
 }
 
-// ================ СТАТИСТИКА ================
 export interface InventoryStats {
   totalProducts: number;
   totalDisposals: number;
@@ -148,12 +137,11 @@ export interface InventoryStats {
       value: number;
     };
   };
-  bySection: {
+  bySection?: {
     [key: string]: number;
   };
 }
 
-// ================ ДЛЯ МОДАЛОК ================
 export interface ProductFormData {
   name: string;
   category: string;
@@ -163,6 +151,7 @@ export interface ProductFormData {
   roomId: string;
   roomName: string;
   info?: string;
+  section?: string;
 }
 
 export interface WriteoffFormData {
@@ -170,9 +159,7 @@ export interface WriteoffFormData {
   date: string;
   person: string;
 }
-// Добавь в конец файла, после существующих типов
 
-// ================ ОТЧЕТЫ ================
 export type ReportFormat = "excel" | "word" | "pdf";
 
 export interface ReportOptions {

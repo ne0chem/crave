@@ -1,4 +1,4 @@
-import "./CatalogLayout.css"; // создадим файл со стилями
+import "./CatalogLayout.css";
 
 import Main from "../../components/Main/Main";
 

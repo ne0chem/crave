@@ -1,7 +1,6 @@
 import axios from "axios";
 
-// ВРЕМЕННО используем прямой URL как в старом коде
-const API_URL = "http://88.210.52.152:8081/api/v1";
+const API_URL = "http://88.210.52.152:8081/";
 
 export const apiClient = axios.create({
   baseURL: API_URL,
@@ -9,9 +8,9 @@ export const apiClient = axios.create({
     "Content-Type": "application/json",
     Accept: "application/json",
   },
-  withCredentials: true, // как в старом коде
+  withCredentials: true,
 });
-// Логируем каждый запрос
+
 apiClient.interceptors.request.use(
   (config) => {
     console.log("📤 Исходящий запрос:", {
@@ -39,7 +38,6 @@ apiClient.interceptors.request.use(
   },
 );
 
-// Логируем каждый ответ
 apiClient.interceptors.response.use(
   (response) => {
     console.log("📥 Ответ получен:", {

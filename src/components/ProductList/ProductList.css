@@ -144,15 +144,14 @@
   color: var(--text-primary);
 }
 .action-item {
-  margin-top: 1rem;
-  display: flex;
+  margin-top: 2rem;
   justify-content: space-between;
 }
 .action-text {
   font-weight: 600;
 }
 /* Кнопка редактирования */
-.edit-button {
+.edit-button .action-button {
   background: none;
   border: none;
   cursor: pointer;
@@ -170,7 +169,7 @@
   gap: 0.5rem;
 }
 .action-icon {
-  width: 3rem;
+  width: 2.5rem;
   height: 2rem;
   object-fit: contain;
 }

@@ -1,12 +1,7 @@
-// src/types/report.types.ts
-
-// Типы форматов отчетов
 export type ReportFormat = "excel" | "word" | "pdf";
 
-// Типы отчетов
 export type ReportType = "active" | "writtenOff" | "all";
 
-// Интерфейс опций отчета
 export interface ReportOptions {
   format: ReportFormat;
   type: ReportType;
@@ -16,7 +11,6 @@ export interface ReportOptions {
   includeFields?: string[];
 }
 
-// Интерфейс данных для отчета
 export interface ReportData {
   items: any[];
   filters: {
@@ -36,7 +30,6 @@ export interface ReportData {
   totalSum: number;
 }
 
-// Константы для заголовков
 export const REPORT_TITLES = {
   active: "Отчет по активным товарам",
   writtenOff: "Отчет по списанным товарам",
@@ -48,21 +41,18 @@ export const REPORT_TITLES = {
   },
 } as const;
 
-// Константы для названий файлов
 export const REPORT_FILENAMES = {
   active: "активные",
   writtenOff: "списанные",
   all: "все_товары",
 } as const;
 
-// Константы для иконок форматов
 export const FORMAT_ICONS = {
   excel: "📊",
   word: "📄",
   pdf: "📑",
 } as const;
 
-// Константы для названий форматов
 export const FORMAT_NAMES = {
   excel: "Excel",
   word: "Word",

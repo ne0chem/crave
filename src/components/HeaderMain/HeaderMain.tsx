@@ -1,21 +1,35 @@
-// components/HeaderMain/HeaderMain.tsx
-import { useAuth } from "../../contexts/DummyAuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchModal from "../Modal/SearchModal/SearchModal";
 import InventoryReportSelector from "../InventoryReportSelector/InventoryReportSelector";
+import SelectReportForDisplay from "../SelectReportForDisplay/SelectReportForDisplay";
 import "./HeaderMain.css";
 
 interface HeaderMainProps {
   onInventoryModeChange?: (isActive: boolean) => void;
+  onSelectReportForDisplay?: (reportId: string) => void;
+  isInventoryMode?: boolean;
+  selectedReportId?: string | null;
 }
 
-export default function HeaderMain({ onInventoryModeChange }: HeaderMainProps) {
+export default function HeaderMain({
+  onInventoryModeChange,
+  onSelectReportForDisplay,
+  isInventoryMode: externalIsInventoryMode,
+  selectedReportId,
+}: HeaderMainProps) {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isReportSelectorOpen, setIsReportSelectorOpen] = useState(false);
-  const [isInventoryMode, setIsInventoryMode] = useState(false);
+  const [isDisplaySelectorOpen, setIsDisplaySelectorOpen] = useState(false);
+  const [internalInventoryMode, setInternalInventoryMode] = useState(false);
+
+  const isInventoryMode =
+    externalIsInventoryMode !== undefined
+      ? externalIsInventoryMode
+      : internalInventoryMode;
 
   const handleSectionClick = (sectionName: any) => {
     navigate("/catalog", {
@@ -23,10 +37,26 @@ export default function HeaderMain({ onInventoryModeChange }: HeaderMainProps) {
     });
   };
 
-  const handleInventoryClick = () => {
-    const newMode = !isInventoryMode;
-    setIsInventoryMode(newMode);
+  const handleInventoryResultsClick = () => {
+    setIsDisplaySelectorOpen(true);
+  };
+
+  const handleReportSelectForDisplay = (reportId: string) => {
+    const newMode = true;
+    setInternalInventoryMode(newMode);
     onInventoryModeChange?.(newMode);
+    onSelectReportForDisplay?.(reportId);
+    setIsDisplaySelectorOpen(false);
+  };
+
+  const handleExitInventoryMode = () => {
+    const newMode = false;
+    setInternalInventoryMode(newMode);
+    onInventoryModeChange?.(newMode);
+  };
+
+  const handleReportClick = () => {
+    setIsReportSelectorOpen(true);
   };
 
   return (
@@ -35,15 +65,18 @@ export default function HeaderMain({ onInventoryModeChange }: HeaderMainProps) {
         <div className="header__button">
           <button
             className={`reuslt ${isInventoryMode ? "active" : ""}`}
-            onClick={handleInventoryClick}
+            onClick={
+              isInventoryMode
+                ? handleExitInventoryMode
+                : handleInventoryResultsClick
+            }
           >
-            Результаты инвентаризации
+            {isInventoryMode
+              ? "Выйти из режима инвентаризации"
+              : "Результаты инвентаризации"}
           </button>
 
-          <button
-            className="reuslt"
-            onClick={() => setIsReportSelectorOpen(true)}
-          >
+          <button className="reuslt" onClick={handleReportClick}>
             Отчет инвентаризации
           </button>
 
@@ -61,7 +94,7 @@ export default function HeaderMain({ onInventoryModeChange }: HeaderMainProps) {
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              handleSectionClick("Административно-управленческая (служебная)");
+              handleSectionClick("Административно-управленческая (Служебная)");
             }}
           >
             Административно-управленческая (служебная)
@@ -87,7 +120,7 @@ export default function HeaderMain({ onInventoryModeChange }: HeaderMainProps) {
             Сценографическая
           </a>
           <button
-            className="section-link stock-btn"
+            className="section4"
             onClick={() => handleSectionClick("Склад")}
           >
             Склад
@@ -95,6 +128,11 @@ export default function HeaderMain({ onInventoryModeChange }: HeaderMainProps) {
         </nav>
 
         <div className="user-info">
+          {isInventoryMode && selectedReportId && (
+            <span className="active-report-badge">
+              Отчет: {selectedReportId.slice(0, 8)}...
+            </span>
+          )}
           <button onClick={logout} className="logout-btn">
             Выйти
           </button>
@@ -109,6 +147,12 @@ export default function HeaderMain({ onInventoryModeChange }: HeaderMainProps) {
       <InventoryReportSelector
         isOpen={isReportSelectorOpen}
         onClose={() => setIsReportSelectorOpen(false)}
+      />
+
+      <SelectReportForDisplay
+        isOpen={isDisplaySelectorOpen}
+        onClose={() => setIsDisplaySelectorOpen(false)}
+        onSelectReport={handleReportSelectForDisplay}
       />
     </>
   );
