@@ -8,6 +8,7 @@ export interface User {
   login: string;
   role: string;
   name?: string;
+  // Убираем token из User, так как он хранится отдельно
 }
 
 export interface LoginResponse {

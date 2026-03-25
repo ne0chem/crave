@@ -1,8 +1,13 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+} from "react";
 import { authApi, getUserFromToken } from "../api/auth/auth";
 import { LoginCredentials, AuthState, User } from "../types/auth.types";
-
-console.log("📁 AuthContext модуль загружен");
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -21,7 +26,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (savedUser) {
       try {
         user = JSON.parse(savedUser);
-        console.log("📦 Загружен пользователь из localStorage:", user);
       } catch (e) {
         console.error("Ошибка парсинга пользователя:", e);
       }
@@ -29,7 +33,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       user = getUserFromToken(token);
       if (user) {
         localStorage.setItem("user", JSON.stringify(user));
-        console.log("🔓 Пользователь декодирован из токена:", user);
       }
     }
 
@@ -41,21 +44,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
   });
 
-  console.log("📊 Начальное состояние:", {
-    token: state.token ? "есть" : "нет",
-    user: state.user ? state.user.login : "нет",
-    role: state.user?.role || "нет",
-    isLoading: state.isLoading,
-  });
-
-  const login = async (credentials: LoginCredentials) => {
-    console.log("🔐 login вызван");
-
+  const login = useCallback(async (credentials: LoginCredentials) => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
       const response = await authApi.login(credentials);
-      console.log("📦 Ответ от authApi.login:", response);
 
       if (!response.token) {
         throw new Error("Токен не получен");
@@ -67,14 +60,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isLoading: false,
         error: null,
       });
-
-      console.log(
-        "✅ Состояние обновлено, пользователь авторизован:",
-        response.user,
-      );
     } catch (error: any) {
       const errorMessage = error.message || "Ошибка входа";
-      console.error("❌ Ошибка входа:", errorMessage);
       setState((prev) => ({
         ...prev,
         isLoading: false,
@@ -82,11 +69,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }));
       throw error;
     }
-  };
+  }, []);
 
-  const logout = () => {
-    console.log("🚪 logout вызван");
-
+  const logout = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("userRole");
     localStorage.removeItem("user");
@@ -94,23 +79,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     authApi.logout();
 
     setState({ user: null, token: null, isLoading: false, error: null });
+  }, []);
 
-    console.log("✅ Выход выполнен");
-  };
-
-  console.log("🔄 Рендер AuthProvider, состояние:", {
-    hasUser: !!state.user,
-    userLogin: state.user?.login,
-    userRole: state.user?.role,
-    hasToken: !!state.token,
-    isLoading: state.isLoading,
-    hasError: !!state.error,
-  });
+  const contextValue = useMemo(
+    () => ({
+      ...state,
+      login,
+      logout,
+    }),
+    [state, login, logout],
+  );
 
   return (
-    <AuthContext.Provider value={{ ...state, login, logout }}>
-      {children}
-    </AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 

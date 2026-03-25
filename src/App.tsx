@@ -1,11 +1,13 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuth, AuthProvider } from "./contexts/AuthContext";
+import { useAuth } from "./contexts/AuthContext";
 import Auth from "./pages/Auth/Auth";
 import MainPage from "./pages/Main/Main";
 import CatalogLayout from "./pages/Catalog/CatalogLayout";
 import "./App.css";
+import { memo, useMemo } from "react";
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+// Мемоизируем ProtectedRoute
+const ProtectedRoute = memo(({ children }: { children: React.ReactNode }) => {
   const { token, isLoading } = useAuth();
 
   if (isLoading) {
@@ -17,48 +19,53 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   return <>{children}</>;
-};
+});
+
+// Выносим компоненты для маршрутов, чтобы они не создавались заново
+const Category1 = memo(() => <div>Категория 1</div>);
+const Category2 = memo(() => <div>Категория 2</div>);
+const Category3 = memo(() => <div>Категория 3</div>);
 
 function AppRoutes() {
-  return (
-    <Routes>
-      <Route path="/login" element={<Auth />} />
+  // Мемоизируем маршруты, чтобы они не пересоздавались
+  const routes = useMemo(
+    () => (
+      <Routes>
+        <Route path="/login" element={<Auth />} />
 
-      <Route
-        element={
-          <ProtectedRoute>
-            <CatalogLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/catalog" element={<div>Категория 1</div>} />
-        <Route path="/catalog/category1" element={<div>Категория 1</div>} />
-        <Route path="/catalog/category2" element={<div>Категория 2</div>} />
-        <Route path="/catalog/category3" element={<div>Категория 3</div>} />
-      </Route>
+        <Route
+          element={
+            <ProtectedRoute>
+              <CatalogLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/catalog" element={<Category1 />} />
+          <Route path="/catalog/category1" element={<Category1 />} />
+          <Route path="/catalog/category2" element={<Category2 />} />
+          <Route path="/catalog/category3" element={<Category3 />} />
+        </Route>
 
-      <Route
-        path="/main"
-        element={
-          <ProtectedRoute>
-            <MainPage />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/main"
+          element={
+            <ProtectedRoute>
+              <MainPage />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route path="/" element={<Navigate to="/main" replace />} />
-    </Routes>
-  );
+        <Route path="/" element={<Navigate to="/main" replace />} />
+      </Routes>
+    ),
+    [],
+  ); // Пустой массив зависимостей, так как маршруты статичны
+
+  return routes;
 }
 
 function App() {
-  return (
-    <AuthProvider>
-      {" "}
-      {/* ← ОБЯЗАТЕЛЬНО оборачиваем в AuthProvider */}
-      <AppRoutes />
-    </AuthProvider>
-  );
+  return <AppRoutes />;
 }
 
 export default App;

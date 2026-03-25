@@ -7,6 +7,7 @@ import {
   InventoryItem,
   InventoryActionData,
 } from "../types/inventory.types";
+import { useAuth } from "./AuthContext";
 
 interface InventoryContextType {
   reports: InventoryReport[] | undefined;
@@ -44,6 +45,9 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [filters, setFilters] = useState<InventoryFilters>({});
 
+  const { token } = useAuth();
+  const enabled = !!token;
+
   const {
     data: reports,
     isLoading,
@@ -52,7 +56,10 @@ export const InventoryProvider: React.FC<{ children: React.ReactNode }> = ({
   } = useQuery({
     queryKey: [INVENTORY_REPORTS_KEY, filters],
     queryFn: () => inventoryApi.getReports(filters),
+    enabled,
     staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 
   const confirmMutation = useMutation({

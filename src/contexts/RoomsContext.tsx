@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { roomsApi } from "../api/rooms/roomsApi";
 import { Floor, Room } from "../types/room.types";
+import { useAuth } from "./AuthContext";
 
 console.log("📁 RoomsContext модуль загружен");
 
@@ -27,8 +28,10 @@ export const RoomsProvider = ({ children }: { children: React.ReactNode }) => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { token } = useAuth();
 
   const fetchRooms = useCallback(async () => {
+    if (!token) return;
     console.log("🔄 Загрузка комнат...");
     setIsLoading(true);
     setError(null);
@@ -80,7 +83,7 @@ export const RoomsProvider = ({ children }: { children: React.ReactNode }) => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [token]);
 
   const getRoomsByBuilding = useCallback(
     (building: string) => {

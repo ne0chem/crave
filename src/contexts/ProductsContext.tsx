@@ -4,6 +4,7 @@ import React, {
   useState,
   useCallback,
   useRef,
+  useEffect,
 } from "react";
 import { productsApi } from "../api/product/product";
 import {
@@ -14,11 +15,8 @@ import {
   UpdateProductData,
   WriteoffData,
 } from "../types/product.types";
-import { useAuth } from "./DummyAuthContext";
-import { useEffect } from "react";
+import { useAuth } from "./AuthContext";
 import { transformFloorsToProducts } from "../utils/transformProducts";
-
-console.log("📁 ProductsContext модуль загружен");
 
 interface ProductsContextType {
   products: Product[];
@@ -55,8 +53,9 @@ export const ProductsProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const { user } = useAuth();
+  const { user, token, isLoading: authLoading } = useAuth();
   const isAdmin = user?.role === "admin";
+  const isAuthenticated = !!token;
 
   const [products, setProducts] = useState<Product[]>([]);
   const [writtenOffProducts, setWrittenOffProducts] = useState<Disposal[]>([]);
@@ -70,20 +69,14 @@ export const ProductsProvider = ({
   const [selectedBuilding, setSelectedBuilding] = useState<string>("theatre");
 
   const isMounted = useRef(true);
-
-  console.log("📊 ProductsContext состояние:", {
-    productsCount: products.length,
-    writtenOffCount: writtenOffProducts.length,
-    isLoading,
-    hasError: !!error,
-    currentPage,
-    totalPages,
-    isAdmin,
-    selectedBuilding,
-  });
+  const initialLoadDone = useRef(false);
 
   const fetchProducts = useCallback(
     async (newFilters?: ProductFilters) => {
+      if (!isAuthenticated) {
+        return;
+      }
+
       const currentFilters = newFilters || filters;
 
       setIsLoading(true);
@@ -95,7 +88,6 @@ export const ProductsProvider = ({
         let activeProducts: Product[] = [];
 
         if (response && response.floors) {
-          console.log("🔄 Трансформируем данные из формата floors");
           activeProducts = transformFloorsToProducts(response.floors);
         } else if (Array.isArray(response)) {
           activeProducts = response;
@@ -105,11 +97,9 @@ export const ProductsProvider = ({
 
         activeProducts = activeProducts.filter((p: any) => !p.deleted_at);
 
-        console.log("✅ Активные товары загружены:", activeProducts.length);
         setProducts(activeProducts);
         setTotalProducts(activeProducts.length);
       } catch (error: any) {
-        console.error("❌ Ошибка загрузки товаров:", error);
         setError(error.message || "Ошибка загрузки товаров");
         setProducts([]);
         setTotalProducts(0);
@@ -117,15 +107,17 @@ export const ProductsProvider = ({
         setIsLoading(false);
       }
     },
-    [filters],
+    [filters, isAuthenticated],
   );
 
   const fetchWrittenOffProducts = useCallback(
     async (building?: string, newFilters?: ProductFilters) => {
+      if (!isAuthenticated) {
+        return;
+      }
+
       const currentFilters = newFilters || filters;
       const currentBuilding = building || selectedBuilding;
-
-      console.log(`📦 Запрос списанных товаров для здания: ${currentBuilding}`);
 
       setIsLoading(true);
       setError(null);
@@ -163,45 +155,40 @@ export const ProductsProvider = ({
           }));
         }
 
-        console.log(
-          `✅ Списанные товары для ${currentBuilding} загружены:`,
-          disposals.length,
-        );
         setWrittenOffProducts(disposals);
       } catch (error: any) {
-        console.error("❌ Ошибка загрузки списанных товаров:", error);
         setError(error.message || "Ошибка загрузки списанных товаров");
         setWrittenOffProducts([]);
       } finally {
         setIsLoading(false);
       }
     },
-    [filters, selectedBuilding],
+    [filters, selectedBuilding, isAuthenticated],
   );
 
   useEffect(() => {
-    console.log("🔄 ProductsProvider: загружаем товары");
-    Promise.all([fetchProducts(), fetchWrittenOffProducts()]).catch((error) => {
-      console.error("❌ Ошибка при начальной загрузке:", error);
-    });
-  }, []);
+    if (authLoading) {
+      return;
+    }
+
+    if (isAuthenticated && !initialLoadDone.current) {
+      initialLoadDone.current = true;
+      Promise.all([fetchProducts(), fetchWrittenOffProducts()]).catch(() => {
+        // Ошибка уже обработана внутри функций
+      });
+    }
+  }, [authLoading, isAuthenticated, fetchProducts, fetchWrittenOffProducts]);
 
   useEffect(() => {
-    if (selectedBuilding && isMounted.current) {
-      console.log(
-        `🔄 Здание изменено на: ${selectedBuilding}, обновляем списанные товары`,
-      );
+    if (isAuthenticated && selectedBuilding && initialLoadDone.current) {
       fetchWrittenOffProducts(selectedBuilding);
     }
-  }, [selectedBuilding, fetchWrittenOffProducts]);
+  }, [selectedBuilding, fetchWrittenOffProducts, isAuthenticated]);
 
   const createProduct = useCallback(
     async (data: CreateProductData) => {
-      console.log("➕ createProduct вызван с данными:", data);
-
       if (!isAdmin) {
         const error = "Только администраторы могут создавать товары";
-        console.error("❌", error);
         setError(error);
         throw new Error(error);
       }
@@ -211,11 +198,9 @@ export const ProductsProvider = ({
 
       try {
         const newProduct = await productsApi.createProduct(data);
-        console.log("✅ Товар создан:", newProduct);
         await fetchProducts();
         return newProduct;
       } catch (error: any) {
-        console.error("❌ Ошибка создания товара:", error);
         setError(error.message || "Ошибка создания товара");
         throw error;
       } finally {
@@ -227,11 +212,8 @@ export const ProductsProvider = ({
 
   const updateProduct = useCallback(
     async (data: UpdateProductData) => {
-      console.log(`✏️ updateProduct вызван для ID ${data.id}:`, data);
-
       if (!isAdmin) {
         const error = "Только администраторы могут обновлять товары";
-        console.error("❌", error);
         setError(error);
         throw new Error(error);
       }
@@ -241,7 +223,6 @@ export const ProductsProvider = ({
 
       try {
         const updatedProduct = await productsApi.updateProduct(data);
-        console.log(`✅ Товар ID ${data.id} обновлен:`, updatedProduct);
 
         await fetchProducts();
         await fetchWrittenOffProducts();
@@ -252,7 +233,6 @@ export const ProductsProvider = ({
 
         return updatedProduct;
       } catch (error: any) {
-        console.error(`❌ Ошибка обновления товара ID ${data.id}:`, error);
         setError(error.message || "Ошибка обновления товара");
         throw error;
       } finally {
@@ -264,11 +244,8 @@ export const ProductsProvider = ({
 
   const writeoffProduct = useCallback(
     async (data: WriteoffData) => {
-      console.log(`📝 writeoffProduct вызван для ID ${data.productId}:`, data);
-
       if (!isAdmin) {
         const error = "Только администраторы могут списывать товары";
-        console.error("❌", error);
         setError(error);
         throw new Error(error);
       }
@@ -278,13 +255,11 @@ export const ProductsProvider = ({
 
       try {
         const result = await productsApi.writeoffProduct(data);
-        console.log(`✅ Товар ID ${data.productId} списан`);
 
         await Promise.all([fetchProducts(), fetchWrittenOffProducts()]);
 
         return result;
       } catch (error: any) {
-        console.error(`❌ Ошибка списания товара ID ${data.productId}:`, error);
         setError(error.message || "Ошибка списания товара");
         throw error;
       } finally {
@@ -302,31 +277,31 @@ export const ProductsProvider = ({
     setError(null);
   }, []);
 
-  return (
-    <ProductsContext.Provider
-      value={{
-        products,
-        writtenOffProducts,
-        selectedProduct,
-        totalProducts,
-        currentPage,
-        totalPages,
-        isLoading,
-        error,
-        filters,
-        selectedBuilding,
+  const value = {
+    products,
+    writtenOffProducts,
+    selectedProduct,
+    totalProducts,
+    currentPage,
+    totalPages,
+    isLoading,
+    error,
+    filters,
+    selectedBuilding,
 
-        fetchProducts,
-        fetchWrittenOffProducts,
-        createProduct,
-        updateProduct,
-        writeoffProduct,
-        setFilters,
-        setSelectedBuilding,
-        clearSelectedProduct,
-        clearError,
-      }}
-    >
+    fetchProducts,
+    fetchWrittenOffProducts,
+    createProduct,
+    updateProduct,
+    writeoffProduct,
+    setFilters,
+    setSelectedBuilding,
+    clearSelectedProduct,
+    clearError,
+  };
+
+  return (
+    <ProductsContext.Provider value={value}>
       {children}
     </ProductsContext.Provider>
   );
@@ -339,3 +314,6 @@ export const useProducts = () => {
   }
   return context;
 };
+
+// Также экспортируем AuthProvider из этого файла, если он нужен
+export { useAuth, AuthProvider } from "./AuthContext";

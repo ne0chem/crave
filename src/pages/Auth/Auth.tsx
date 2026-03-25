@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useCallback, memo } from "react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import "./Auth.css";
 
-export default function Auth() {
+function Auth() {
   const [formData, setFormData] = useState({
     login: "",
     password: "",
@@ -13,51 +13,44 @@ export default function Auth() {
   const { login, isLoading, error } = useAuth();
   const navigate = useNavigate();
 
-  const handleChange = (e: any) => {
+  // Мемоизируем обработчик изменения
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
     setLocalError("");
-  };
+  }, []);
 
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-    setLocalError("");
+  // Мемоизируем обработчик отправки
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      setLocalError("");
 
-    if (!formData.login.trim() || !formData.password.trim()) {
-      setLocalError("Заполните все поля");
-      return;
-    }
+      if (!formData.login.trim() || !formData.password.trim()) {
+        setLocalError("Заполните все поля");
+        return;
+      }
 
-    try {
-      console.log("📤 Отправка данных для входа:", {
-        login: formData.login,
-        password: "***",
-      });
+      try {
+        await login({
+          login: formData.login,
+          password: formData.password,
+        });
 
-      await login({
-        login: formData.login,
-        password: formData.password,
-      });
+        navigate("/main", { replace: true });
+      } catch (err) {
+        // Ошибка уже обрабатывается в AuthContext
+        console.error("Ошибка входа:", err);
+      }
+    },
+    [formData.login, formData.password, login, navigate],
+  );
 
-      console.log("✅ Вход выполнен успешно");
-
-      const token = localStorage.getItem("token");
-      const user = localStorage.getItem("user");
-      console.log("🔑 Токен после входа:", token ? "есть" : "нет");
-      console.log(
-        "👤 Пользователь после входа:",
-        user ? JSON.parse(user) : "нет",
-      );
-
-      navigate("/main", { replace: true });
-      console.log("🔄 Редирект на /main выполнен");
-    } catch (err) {
-      console.error("❌ Ошибка входа в handleSubmit:", err);
-    }
-  };
+  // Мемоизируем значение ошибки для отображения
+  const displayError = error || localError;
 
   return (
     <div className="auth">
@@ -67,9 +60,7 @@ export default function Auth() {
           <p className="auth__subtitle">Войдите в свой аккаунт</p>
         </div>
 
-        {(error || localError) && (
-          <div className="auth__error">{error || localError}</div>
-        )}
+        {displayError && <div className="auth__error">{displayError}</div>}
 
         <form className="auth__form" onSubmit={handleSubmit}>
           <div className="auth__input-group">
@@ -77,7 +68,7 @@ export default function Auth() {
               Логин
             </label>
             <input
-              className={`auth__input ${error || localError ? "auth__input--error" : ""}`}
+              className={`auth__input ${displayError ? "auth__input--error" : ""}`}
               type="text"
               name="login"
               id="login"
@@ -94,7 +85,7 @@ export default function Auth() {
               Пароль
             </label>
             <input
-              className={`auth__input ${error || localError ? "auth__input--error" : ""}`}
+              className={`auth__input ${displayError ? "auth__input--error" : ""}`}
               type="password"
               name="password"
               id="password"
@@ -120,3 +111,6 @@ export default function Auth() {
     </div>
   );
 }
+
+// Мемоизируем компонент
+export default memo(Auth);
