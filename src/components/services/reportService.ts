@@ -29,7 +29,7 @@ class ReportService {
       Наименование: item.name,
       Категория: item.inventory_tools_type,
       "Инв. номер": item.inv_number,
-      Цена: item.price,
+      Стоимость: item.price,
       Этаж: item.floor_number,
       Помещение: item.room_name || "Не указано",
       Статус: isDisposal(item) ? "Списано" : "Активен",
@@ -52,12 +52,12 @@ class ReportService {
         ["Фильтры:"],
         ["Поиск:", filters.searchQuery || "Не задан"],
         ["Секция:", filters.selectedSection || "Все"],
-        ["Цена от:", filters.priceFrom || "Не задано"],
-        ["Цена до:", filters.priceTo || "Не задано"],
+        ["Стоимость от:", filters.priceFrom || "Не задано"],
+        ["Стоимость до:", filters.priceTo || "Не задано"],
         ["Категория:", filters.selectedFilters?.category || "Все"],
         ["Помещение:", filters.selectedFilters?.room || "Все"],
         [],
-        ["Итого:", `${items.length} товаров`],
+        ["Итого:", `${items.length} МЦ`],
         [
           "Общая сумма:",
           `${items.reduce((sum, item) => sum + item.price, 0)} ₽`,
@@ -76,7 +76,7 @@ class ReportService {
     }
 
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Товары");
+    XLSX.utils.book_append_sheet(wb, ws, "МЦ");
 
     const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
     const dataBlob = new Blob([excelBuffer], {
@@ -97,7 +97,7 @@ class ReportService {
       <html>
       <head>
         <meta charset="UTF-8">
-        <title>${options.title || "Отчет по товарам"}</title>
+        <title>${options.title || "Отчет по МЦ"}</title>
         <style>
           body { font-family: 'Times New Roman', serif; margin: 30px; }
           h1 { color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 10px; }
@@ -111,7 +111,7 @@ class ReportService {
         </style>
       </head>
       <body>
-        <h1>${options.title || "Отчет по товарам"}</h1>
+        <h1>${options.title || "Отчет по МЦ"}</h1>
         
         ${options.showDate ? `<p>Дата формирования: ${new Date().toLocaleString("ru-RU")}</p>` : ""}
     `;
@@ -122,7 +122,7 @@ class ReportService {
           <h3>Примененные фильтры:</h3>
           <p><strong>Поиск:</strong> ${filters.searchQuery || "Не задан"}</p>
           <p><strong>Секция:</strong> ${filters.selectedSection || "Все"}</p>
-          <p><strong>Цена:</strong> от ${filters.priceFrom || "не указано"} до ${filters.priceTo || "не указано"}</p>
+          <p><strong>Стоимость:</strong> от ${filters.priceFrom || "не указано"} до ${filters.priceTo || "не указано"}</p>
           <p><strong>Категория:</strong> ${filters.selectedFilters?.category || "Все"}</p>
           <p><strong>Помещение:</strong> ${filters.selectedFilters?.room || "Все"}</p>
         </div>
@@ -137,7 +137,7 @@ class ReportService {
             <th>Наименование</th>
             <th>Категория</th>
             <th>Инв. номер</th>
-            <th>Цена</th>
+            <th>Стоимость</th>
             <th>Помещение</th>
             <th>Статус</th>
             ${items.some((item) => isDisposal(item)) ? "<th>Дата списания</th><th>Причина</th>" : ""}
@@ -172,7 +172,7 @@ class ReportService {
         </tbody>
       </table>
       <div class="summary">
-        <p><strong>Всего товаров:</strong> ${items.length}</p>
+        <p><strong>Всего МЦ:</strong> ${items.length}</p>
         <p><strong>Общая сумма:</strong> ${totalSum.toLocaleString()} ₽</p>
       </div>
       </body>

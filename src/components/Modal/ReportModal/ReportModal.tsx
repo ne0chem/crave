@@ -46,7 +46,7 @@ const ReportModal: React.FC<ReportModalProps> = ({
 
         <div className="report-modal-content">
           <p className="items-count">
-            Будет сформирован отчет по <strong>{itemCount}</strong> товарам
+            Будет сформирован отчет по <strong>{itemCount}</strong> МЦ
           </p>
 
           <div className="format-section">

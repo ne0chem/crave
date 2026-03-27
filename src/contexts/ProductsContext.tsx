@@ -100,7 +100,7 @@ export const ProductsProvider = ({
         setProducts(activeProducts);
         setTotalProducts(activeProducts.length);
       } catch (error: any) {
-        setError(error.message || "Ошибка загрузки товаров");
+        setError(error.message || "Ошибка загрузки МЦ");
         setProducts([]);
         setTotalProducts(0);
       } finally {
@@ -157,7 +157,7 @@ export const ProductsProvider = ({
 
         setWrittenOffProducts(disposals);
       } catch (error: any) {
-        setError(error.message || "Ошибка загрузки списанных товаров");
+        setError(error.message || "Ошибка загрузки списанных МЦ");
         setWrittenOffProducts([]);
       } finally {
         setIsLoading(false);

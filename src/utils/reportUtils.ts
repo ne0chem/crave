@@ -1,8 +1,4 @@
-import {
-  InventoryReport,
-  InventoryRoom,
-  InventoryItem,
-} from "../types/inventory.types";
+import { InventoryReport, InventoryRoom } from "../types/inventory.types";
 
 export const formatPrice = (price: number): string => {
   return new Intl.NumberFormat("ru-RU", {

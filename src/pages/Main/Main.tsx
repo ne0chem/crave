@@ -361,7 +361,7 @@ const MainPage = () => {
             </div>
 
             {productsLoading ? (
-              <div className="loading">Загрузка товаров...</div>
+              <div className="loading">Загрузка МЦ...</div>
             ) : (
               <>
                 <div className="room-stats">

@@ -273,9 +273,7 @@ const Main = () => {
     const options: ReportOptions = {
       format: "word",
       type: showWrittenOff ? "writtenOff" : "active",
-      title: showWrittenOff
-        ? "Отчет по списанным товарам"
-        : "Отчет по активным товарам",
+      title: showWrittenOff ? "Отчет по списанным МЦ" : "Отчет по активным МЦ",
       showFilters: true,
       showDate: true,
     };

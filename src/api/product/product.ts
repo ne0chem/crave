@@ -87,7 +87,7 @@ export const productsApi = {
       return {
         success: true,
         productId: data.productId,
-        message: "Товар успешно списан",
+        message: "МЦ успешно списана",
       };
     } catch (error: any) {
       if (error.response?.status === 401) {

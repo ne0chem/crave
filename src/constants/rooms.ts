@@ -382,7 +382,7 @@ export const ROOMS_THEATER: Room[] = [
 
   {
     id: "33e1ff17-4d6a-4fa5-8f0b-edd6931e4059",
-    name: "Кладовая",
+    name: "Сцена",
     left: "720px",
     top: "258px",
     width: "71px",
@@ -734,7 +734,7 @@ export const ROOMS_THEATER: Room[] = [
     width: "82px",
     height: "17px",
     roomNumber: "37/1",
-    section: "Служебная",
+    section: "Сценографическая",
   },
   {
     id: "0375d6ba-00f4-4b5f-ab00-6cfb3c9fde1a",

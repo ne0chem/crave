@@ -252,9 +252,7 @@ export default function ProductList({
 
       {products.length === 0 && (
         <div className="products-list-empty">
-          {showWrittenOff
-            ? "Нет списанных товаров"
-            : "Нет товаров в этой категории"}
+          {showWrittenOff ? "Нет списанных МЦ" : "Нет МЦ в этой категории"}
         </div>
       )}
     </div>
